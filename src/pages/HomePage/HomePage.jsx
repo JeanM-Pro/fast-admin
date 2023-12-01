@@ -2,21 +2,22 @@ import { toast } from "react-toastify";
 import { Navbar } from "../../components/NavBar";
 import { auth } from "../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { MoonLoader } from "react-spinners";
 import { miContexto } from "../../context/AppContext";
 import { Tabla } from "../../components/Tabla";
 import { RegisterRutaPage } from "./Components/Modals/RegisterRutaModal";
 import { TablaAdministradores } from "../../components/TablaAdministradores";
+import { CrearClienteModal } from "./Components/Modals/CrearClienteModal";
 
 export const HomePage = () => {
   const [isLogouting, setIsLogouting] = useState(false);
   const [isModalCreateRuta, setIsModalCreateRuta] = useState(false);
+  const [isModalCreateCliente, setisModalCreateCliente] = useState(false);
   const navigate = useNavigate();
   const user = auth.currentUser;
-  const { usersAdminData, userData, rutasData } = useContext(miContexto);
-  console.log(userData);
-  console.log(rutasData);
+  const { usersAdminData, userData, rutasData, usuarioRuta } =
+    useContext(miContexto);
 
   const handleLogout = async () => {
     setIsLogouting(true);
@@ -30,11 +31,18 @@ export const HomePage = () => {
     }
   };
 
+  console.log(usuarioRuta);
+
   return (
     <>
       {isModalCreateRuta ? (
         <RegisterRutaPage setIsModalCreateRuta={setIsModalCreateRuta} />
       ) : null}
+
+      {isModalCreateCliente ? (
+        <CrearClienteModal setisModalCreateCliente={setisModalCreateCliente} />
+      ) : null}
+
       <Navbar />
       <div className="w-full min-h-screen bg-gray-200 pt-16 px-2 md:px-8">
         <button
@@ -82,7 +90,18 @@ export const HomePage = () => {
           </button>
         )}
 
+        {usuarioRuta && (
+          <button
+            type="button"
+            className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+            onClick={() => setisModalCreateCliente(true)}
+          >
+            Agregar cliente
+          </button>
+        )}
+
         {userData && <h2>{userData.email}</h2>}
+        {usuarioRuta && <h2>{usuarioRuta.nombreRuta}</h2>}
 
         {user?.email === "jeancenteno54@fastadmin.com" && (
           <div className="w-full px-2 overflow-x-auto py-2">
