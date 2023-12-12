@@ -22,3 +22,9 @@ code {
     4px
   ); /* Puedes ajustar el valor del desenfoque según tus preferencias */
 }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { FaRegAddressBook, FaRoute } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
@@ -7,25 +7,34 @@ import { MoonLoader } from "react-spinners";
 import { BsTelephone } from "react-icons/bs";
 import { HiOutlineIdentification } from "react-icons/hi2";
 import { HiOutlinePhotograph } from "react-icons/hi";
-import { storage } from "../../../../firebase/firebaseConfig";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
+import { guardarClienteEnFirebase, uploadImage } from "../../firebaseFunctions";
+import { toast } from "react-toastify";
+import { CampoEntrada } from "./CampoEntrada";
+import { miContexto } from "../../../../../context/AppContext";
 
-export const CrearClienteModal = ({ setisModalCreateCliente }) => {
-  const [image, setImage] = useState(null);
+export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
   const [imagePreview, setImagePreview] = useState(null);
-  const [cpf, setCpf] = useState("");
-  const [nombreCliente, setNombreCliente] = useState("");
-  const [direccionCobro, setDireccionCobro] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [ubicacion, setUbicacion] = useState("");
-  const [valorPrestamo, setValorPrestamo] = useState(0);
-  const [porcentajeInteres, setPorcentajeInteres] = useState(0);
-  const [cuotasPactadas, setCuotasPactadas] = useState(1);
-  const [pagoDiario, setPagoDiario] = useState(0);
-  const [formaDePago, setFormaDePago] = useState("diario");
-  const [fechaFinal, setFechaFinal] = useState("");
+  const [datosCliente, setDatosCliente] = useState({
+    image: null,
+    cpf: "",
+    nombreCliente: "",
+    direccionCobro: "",
+    telefono: "",
+    direccion: "",
+    descripcion: "",
+    ubicacion: "",
+    valorPrestamo: 1,
+    porcentajeInteres: 0,
+    cuotasPactadas: 1,
+    pagoDiario: 0,
+    abono: 0,
+    cuotasPagadas: 0,
+    formaDePago: "diario",
+    fechaFinal: "",
+  });
+
+  const { setInfoClientes, infoClientes } = useContext(miContexto);
 
   const [isSubmiting, setIsSubmiting] = useState(false);
 
@@ -33,59 +42,71 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
 
   const handleValorPrestamoChange = (e) => {
     const valorPrestamoNum = parseInt(e.target.value);
-    const porcentajeInteresNum = parseInt(porcentajeInteres);
-    const cuotasPactadasNum = parseInt(cuotasPactadas);
+    setDatosCliente((prevDatosCliente) => {
+      const porcentajeInteresNum = parseInt(prevDatosCliente.porcentajeInteres);
+      const cuotasPactadasNum = parseInt(prevDatosCliente.cuotasPactadas);
 
-    const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
-    const valorTotal = valorPrestamoNum + porcentajeTotal;
-    const pagoDiarioNum = Math.ceil(valorTotal / cuotasPactadasNum);
+      const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
+      const valorTotal = valorPrestamoNum + porcentajeTotal;
 
-    setValorPrestamo(valorPrestamoNum);
-    setPagoDiario(pagoDiarioNum);
+      return {
+        ...prevDatosCliente,
+        valorPrestamo: valorPrestamoNum,
+        pagoDiario: valorTotal / cuotasPactadasNum,
+      };
+    });
   };
 
   const handlePorcentajeInteresChange = (e) => {
     const porcentajeInteresNum = parseInt(e.target.value);
-    const valorPrestamoNum = parseInt(valorPrestamo);
-    const cuotasPactadasNum = parseInt(cuotasPactadas);
+    setDatosCliente((prevDatosCliente) => {
+      const valorPrestamoNum = parseInt(prevDatosCliente.valorPrestamo);
+      const cuotasPactadasNum = parseInt(prevDatosCliente.cuotasPactadas);
 
-    const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
-    const valorTotal = valorPrestamoNum + porcentajeTotal;
-    const pagoDiarioNum = Math.ceil(valorTotal / cuotasPactadasNum);
+      const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
+      const valorTotal = valorPrestamoNum + porcentajeTotal;
 
-    setPorcentajeInteres(porcentajeInteresNum);
-    setPagoDiario(pagoDiarioNum);
+      return {
+        ...prevDatosCliente,
+        porcentajeInteres: porcentajeInteresNum,
+        pagoDiario: valorTotal / cuotasPactadasNum,
+      };
+    });
   };
 
   const handleCuotasPactadasChange = (e) => {
     const cuotasPactadasNum = parseInt(e.target.value);
-    const valorPrestamoNum = parseInt(valorPrestamo);
-    const porcentajeInteresNum = parseInt(porcentajeInteres);
+    setDatosCliente((prevDatosCliente) => {
+      const valorPrestamoNum = parseInt(prevDatosCliente.valorPrestamo);
+      const porcentajeInteresNum = parseInt(prevDatosCliente.porcentajeInteres);
 
-    const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
-    const valorTotal = valorPrestamoNum + porcentajeTotal;
-    const pagoDiarioNum = Math.ceil(valorTotal / cuotasPactadasNum);
+      const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
+      const valorTotal = valorPrestamoNum + porcentajeTotal;
 
-    setCuotasPactadas(cuotasPactadasNum);
-    setPagoDiario(pagoDiarioNum);
+      // Calcular la fecha final excluyendo los domingos
+      const fechaInicial = new Date();
+      let fechaFinal = new Date(fechaInicial);
 
-    // Calcular la fecha final excluyendo los domingos
-    const fechaInicial = new Date();
-    let fechaFinal = new Date(fechaInicial);
-
-    for (let i = 0; i < cuotasPactadasNum; i++) {
-      // Añadir un día
-      fechaFinal.setDate(fechaFinal.getDate() + 1);
-
-      // Si es domingo, agregar un día extra
-      if (fechaFinal.getDay() === 0) {
+      for (let i = 0; i < cuotasPactadasNum; i++) {
+        // Añadir un día
         fechaFinal.setDate(fechaFinal.getDate() + 1);
-      }
-    }
 
-    // Formatear la fecha
-    const fechaFinalFormateada = format(fechaFinal, "dd/MM/yyyy");
-    setFechaFinal(fechaFinalFormateada);
+        // Si es domingo, agregar un día extra
+        if (fechaFinal.getDay() === 0) {
+          fechaFinal.setDate(fechaFinal.getDate() + 1);
+        }
+      }
+
+      // Formatear la fecha
+      const fechaFinalFormateada = format(fechaFinal, "dd/MM/yyyy");
+
+      return {
+        ...prevDatosCliente,
+        cuotasPactadas: cuotasPactadasNum,
+        pagoDiario: valorTotal / cuotasPactadasNum,
+        fechaFinal: fechaFinalFormateada,
+      };
+    });
   };
 
   function obtenerFechaActual() {
@@ -116,7 +137,10 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setUbicacion(`${latitude}, ${longitude}`);
+          setDatosCliente({
+            ...datosCliente,
+            ubicacion: `${latitude}, ${longitude}`,
+          });
         },
         (error) => {
           console.error("Error obteniendo la ubicación:", error);
@@ -130,7 +154,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file);
+      setDatosCliente({ ...datosCliente, image: file });
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -139,32 +163,19 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
     }
   };
 
-  const uploadImage = async () => {
-    try {
-      if (image) {
-        const storageRef = storage.ref(`clientes/${cpf}`);
-        const imageRef = storageRef.child(image.name);
-        await imageRef.put(image);
-        const url = await imageRef.getDownloadURL();
-        return url;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error uploading image to Firebase Storage:", error);
-      return null;
-    }
-  };
-
   const crearCliente = async (e) => {
     e.preventDefault();
     setIsSubmiting(true);
 
     try {
-      const imageUrl = await uploadImage();
+      const imageUrl = await uploadImage({
+        image: datosCliente.image,
+        cpf: datosCliente.cpf,
+      });
       // Ahora puedes utilizar 'imageUrl' para almacenar la URL de la imagen en la base de datos o donde sea necesario
-      const valorPrestamoNum = parseInt(valorPrestamo);
-      const porcentajeInteresNum = parseInt(porcentajeInteres);
-      const cuotasPactadasNum = parseInt(cuotasPactadas);
+      const valorPrestamoNum = parseInt(datosCliente.valorPrestamo);
+      const porcentajeInteresNum = parseInt(datosCliente.porcentajeInteres);
+      const cuotasPactadasNum = parseInt(datosCliente.cuotasPactadas);
       // Calcular el porcentaje del valor del préstamo
       const porcentajeTotal = (valorPrestamoNum * porcentajeInteresNum) / 100;
 
@@ -174,7 +185,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
       // Calcular el pago diario y redondear al número entero superior
       const pagoDiarioNum = Math.ceil(valorTotal / cuotasPactadasNum);
 
-      setPagoDiario(pagoDiarioNum);
+      setDatosCliente({ ...datosCliente, pagoDiario: pagoDiarioNum });
 
       // Calcular la fecha final omitiendo los domingos
       const fechaInicial = new Date();
@@ -183,9 +194,24 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
         cuotasPactadasNum
       );
 
-      setFechaFinal(fechaFinalCalculada);
+      setDatosCliente({ ...datosCliente, fechaFinal: fechaFinalCalculada });
+
+      const clienteData = {
+        imageUrl,
+        datosCliente,
+      };
+
+      await guardarClienteEnFirebase(
+        clienteData,
+        usuarioRuta,
+        fechaActual,
+        setInfoClientes,
+        infoClientes
+      );
     } finally {
       setIsSubmiting(false);
+      setisModalCreateCliente(false);
+      toast.success("Cliente agregado con exito");
     }
   };
 
@@ -203,6 +229,61 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
 
     return fecha.toLocaleDateString();
   };
+
+  const campos = [
+    {
+      icono: <HiOutlineIdentification size={24} />,
+      placeholder: "CPF",
+      valor: datosCliente.cpf,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, cpf: e.target.value }),
+    },
+    {
+      icono: <AiOutlineUser size={24} />,
+      placeholder: "Nombre del Cliente",
+      valor: datosCliente.nombreCliente,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, nombreCliente: e.target.value }),
+    },
+    {
+      icono: <FaRoute size={24} />,
+      placeholder: "Direccion de Cobro",
+      valor: datosCliente.direccionCobro,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, direccionCobro: e.target.value }),
+    },
+    {
+      icono: <BsTelephone size={24} />,
+      placeholder: "Telefono",
+      valor: datosCliente.telefono,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, telefono: e.target.value }),
+    },
+    {
+      icono: <FaRegAddressBook size={24} />,
+      placeholder: "Direccion de Residencia",
+      valor: datosCliente.direccion,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, direccion: e.target.value }),
+    },
+    {
+      icono: <IoStorefrontOutline size={24} />,
+      placeholder: "Descripcion de la tienda",
+      valor: datosCliente.descripcion,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, descripcion: e.target.value }),
+    },
+    {
+      icono: <IoLocationOutline size={24} />,
+      placeholder: "Ubicación Actual",
+      valor: datosCliente.ubicacion,
+      onChange: (e) =>
+        setDatosCliente({ ...datosCliente, ubicacion: e.target.value }),
+      onClick: obtenerUbicacionActual,
+      readOnly: true,
+    },
+    // Agrega más campos según sea necesario
+  ];
 
   return (
     <>
@@ -248,90 +329,9 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
                 />
               </div>
 
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <HiOutlineIdentification size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="CPF"
-                  onChange={(e) => setCpf(e.target.value)}
-                />
-              </div>
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <AiOutlineUser size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="Nombre del Cliente"
-                  onChange={(e) => setNombreCliente(e.target.value)}
-                />
-              </div>
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <FaRoute size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="Direccion de Cobro"
-                  onChange={(e) => setDireccionCobro(e.target.value)}
-                />
-              </div>
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <BsTelephone size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="Telefono"
-                  onChange={(e) => setTelefono(e.target.value)}
-                />
-              </div>
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <FaRegAddressBook size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="Direccion de Residencia"
-                  onChange={(e) => setDireccion(e.target.value)}
-                />
-              </div>
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <IoStorefrontOutline size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="Descripcion de la tienda"
-                  onChange={(e) => setDescripcion(e.target.value)}
-                />
-              </div>
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  <IoLocationOutline size={24} />
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
-                  placeholder="Ubicación Actual"
-                  value={ubicacion}
-                  onChange={(e) => setUbicacion(e.target.value)}
-                  onClick={obtenerUbicacionActual}
-                />
-              </div>
+              {campos.map((campo, index) => (
+                <CampoEntrada key={index} {...campo} />
+              ))}
 
               <h2 className="text-center text-xl font-semibold">
                 Datos del Credito
@@ -377,7 +377,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
                 <input
                   type="number"
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-                  value={pagoDiario}
+                  value={datosCliente.pagoDiario}
                   readOnly
                 />
               </div>
@@ -388,8 +388,13 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
                 </div>
                 <select
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-                  value={formaDePago}
-                  onChange={(e) => setFormaDePago(e.target.value)}
+                  value={datosCliente.formaDePago}
+                  onChange={(e) =>
+                    setDatosCliente({
+                      ...datosCliente,
+                      formaDePago: e.target.value,
+                    })
+                  }
                 >
                   {opcionesFormaPago.map((opcion) => (
                     <option key={opcion} value={opcion}>
@@ -420,7 +425,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente }) => {
                 <input
                   type="text"
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-                  value={fechaFinal}
+                  value={datosCliente.fechaFinal}
                   readOnly
                 />
               </div>

@@ -9,6 +9,7 @@ export const AppContext = ({ children }) => {
   const [usersAdminData, setUsersAdminData] = useState(null);
   const [rutasData, setRutasData] = useState(null);
   const [usuarioRuta, setUsuarioRuta] = useState(null);
+  const [infoClientes, setInfoClientes] = useState(null);
 
   // Obtebner datos de usuarios administradores
 
@@ -101,7 +102,7 @@ export const AppContext = ({ children }) => {
             console.log("No hay datos de rutas para los administradores");
           }
         } else {
-          console.log("No hay usuarios administradores para consultar rutas");
+          return;
         }
       } catch (error) {
         console.error("Error fetching data from Firebase:", error);
@@ -111,9 +112,46 @@ export const AppContext = ({ children }) => {
     fetchData();
   }, [usersAdminData]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const db = getFirestore();
+        if (usuarioRuta) {
+          const querySnapshot = await getDocs(
+            collection(
+              db,
+              "admin_users",
+              usuarioRuta.adminUid,
+              "rutas",
+              usuarioRuta.uid,
+              "clientes"
+            )
+          );
+          const data = querySnapshot.docs.map((doc) => {
+            const uid = doc.id;
+            const clienteData = doc.data();
+            return { uid, ...clienteData };
+          });
+          setInfoClientes(data);
+        }
+      } catch (error) {
+        console.error("Error fetching data from Firebase:", error);
+      }
+    };
+
+    fetchData();
+  }, [usuarioRuta]);
+
   return (
     <miContexto.Provider
-      value={{ userData, usersAdminData, rutasData, usuarioRuta }}
+      value={{
+        userData,
+        usersAdminData,
+        rutasData,
+        usuarioRuta,
+        infoClientes,
+        setInfoClientes,
+      }}
     >
       {children}
     </miContexto.Provider>

@@ -8,7 +8,8 @@ import { miContexto } from "../../context/AppContext";
 import { Tabla } from "../../components/Tabla";
 import { RegisterRutaPage } from "./Components/Modals/RegisterRutaModal";
 import { TablaAdministradores } from "../../components/TablaAdministradores";
-import { CrearClienteModal } from "./Components/Modals/CrearClienteModal";
+import { CrearClienteModal } from "./Components/Modals/CrearClientesModal/CrearClienteModal";
+import { TablaClientes } from "../../components/TablaClientes";
 
 export const HomePage = () => {
   const [isLogouting, setIsLogouting] = useState(false);
@@ -16,7 +17,7 @@ export const HomePage = () => {
   const [isModalCreateCliente, setisModalCreateCliente] = useState(false);
   const navigate = useNavigate();
   const user = auth.currentUser;
-  const { usersAdminData, userData, rutasData, usuarioRuta } =
+  const { usersAdminData, userData, rutasData, usuarioRuta, infoClientes } =
     useContext(miContexto);
 
   const handleLogout = async () => {
@@ -31,8 +32,6 @@ export const HomePage = () => {
     }
   };
 
-  console.log(usuarioRuta);
-
   return (
     <>
       {isModalCreateRuta ? (
@@ -40,11 +39,14 @@ export const HomePage = () => {
       ) : null}
 
       {isModalCreateCliente ? (
-        <CrearClienteModal setisModalCreateCliente={setisModalCreateCliente} />
+        <CrearClienteModal
+          setisModalCreateCliente={setisModalCreateCliente}
+          usuarioRuta={usuarioRuta}
+        />
       ) : null}
 
       <Navbar />
-      <div className="w-full min-h-screen bg-gray-200 pt-16 px-2 md:px-8">
+      <div className="w-full min-h-screen bg-gray-200 pt-16 px-4 md:px-8">
         <button
           type="button"
           className="bg-[#8131bd] w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
@@ -101,7 +103,11 @@ export const HomePage = () => {
         )}
 
         {userData && <h2>{userData.email}</h2>}
-        {usuarioRuta && <h2>{usuarioRuta.nombreRuta}</h2>}
+        {usuarioRuta && (
+          <h2 className="text-center text-lg font-bold uppercase mt-4">
+            {usuarioRuta.nombreRuta}
+          </h2>
+        )}
 
         {user?.email === "jeancenteno54@fastadmin.com" && (
           <div className="w-full px-2 overflow-x-auto py-2">
@@ -112,6 +118,12 @@ export const HomePage = () => {
         {userData?.isAdmin && (
           <div className="w-full px-2 overflow-x-auto py-2">
             <TablaAdministradores datos={rutasData || []} />
+          </div>
+        )}
+
+        {infoClientes && (
+          <div className="w-full px-2 overflow-x-auto py-2">
+            <TablaClientes datos={infoClientes} usuarioRuta={usuarioRuta} />
           </div>
         )}
       </div>
