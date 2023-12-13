@@ -32,6 +32,8 @@ export const HomePage = () => {
     }
   };
 
+  console.log(infoClientes);
+
   return (
     <>
       {isModalCreateRuta ? (

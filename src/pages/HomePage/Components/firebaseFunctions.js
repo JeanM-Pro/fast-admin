@@ -33,6 +33,7 @@ export const guardarClienteEnFirebase = async (
       descripcion: clienteData.datosCliente.descripcion,
       ubicacion: clienteData.datosCliente.ubicacion,
       imageUrl: clienteData.imageUrl,
+      imageTienda: clienteData.imageTiendaUrl,
       valorPrestamo: clienteData.datosCliente.valorPrestamo,
       porcentajeInteres: clienteData.datosCliente.porcentajeInteres,
       cuotasPactadas: clienteData.datosCliente.cuotasPactadas,
@@ -42,6 +43,9 @@ export const guardarClienteEnFirebase = async (
       formaDePago: clienteData.datosCliente.formaDePago,
       fechaActual,
       fechaFinal: clienteData.datosCliente.fechaFinal,
+      valorPico: clienteData.datosCliente.valorPico,
+      fechaUltimoAbono: clienteData.datosCliente.fechaUltimoAbono,
+      totalAbono: clienteData.datosCliente.totalAbono,
     };
 
     await addDoc(clienteRef, docData);
@@ -52,12 +56,28 @@ export const guardarClienteEnFirebase = async (
   }
 };
 
-export const uploadImage = async ({ image, cpf }) => {
+export const uploadImage = async ({ image, nombre }) => {
   try {
     if (image) {
-      const storageRef = ref(storage, `clientes/${cpf}`);
+      const storageRef = ref(storage, `clientes/${nombre}`);
 
       await uploadBytes(storageRef, image);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error uploading image to Firebase Storage:", error);
+    return null;
+  }
+};
+
+export const uploadImageTienda = async ({ imageTienda, descripcion }) => {
+  try {
+    if (imageTienda) {
+      const storageRef = ref(storage, `tiendas/${descripcion}`);
+
+      await uploadBytes(storageRef, imageTienda);
       const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
     }

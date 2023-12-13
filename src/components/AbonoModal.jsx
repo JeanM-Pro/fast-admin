@@ -2,11 +2,16 @@ import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MoonLoader } from "react-spinners";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
+import { format } from "date-fns";
 
-export const AbonoModal = ({ setIsAbono, selectedAbono, usuarioRuta }) => {
+export const AbonoModal = ({
+  setIsAbono,
+  selectedAbono,
+  usuarioRuta,
+  setSelectedAbono,
+}) => {
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [abono, setAbono] = useState(0);
-  console.log(selectedAbono);
 
   const handleAbonar = async () => {
     try {
@@ -29,16 +34,30 @@ export const AbonoModal = ({ setIsAbono, selectedAbono, usuarioRuta }) => {
       const docSnapshot = await getDoc(clienteRef);
       const clienteData = docSnapshot.data();
 
+      //Calcular las cuotas y el valor pico
+
+      const fechaDeAbono = new Date();
+      const totalAbono = selectedAbono.valorPico + abono;
+      const vecesSuperado = Math.floor(totalAbono / selectedAbono.pagoDiario);
+      const sobrante = totalAbono % selectedAbono.pagoDiario;
+
       // Actualiza los datos en el documento manteniendo los datos originales no editados
       await updateDoc(clienteRef, {
         ...clienteData,
         abono: abono,
-        cuotasPagadas:
-          abono === selectedAbono.pagoDiario
-            ? selectedAbono.cuotasPagadas + 1
-            : selectedAbono.cuotasPagadas,
+        cuotasPagadas: selectedAbono.cuotasPagadas + vecesSuperado,
+        fechaUltimoAbono: format(fechaDeAbono, "dd/MM/yyyy"),
+        valorPico: sobrante,
+        totalAbono: selectedAbono.totalAbono + abono,
       });
-
+      setSelectedAbono({
+        ...selectedAbono,
+        abono: abono,
+        cuotasPagadas: selectedAbono.cuotasPagadas + vecesSuperado,
+        fechaUltimoAbono: format(fechaDeAbono, "dd/MM/yyyy"),
+        valorPico: sobrante,
+        totalAbono: selectedAbono.totalAbono + abono,
+      });
       setIsAbono(false);
     } catch (error) {
       console.error("Error updating data in Firebase:", error);

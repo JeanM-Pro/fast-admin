@@ -8,15 +8,21 @@ import { BsTelephone } from "react-icons/bs";
 import { HiOutlineIdentification } from "react-icons/hi2";
 import { HiOutlinePhotograph } from "react-icons/hi";
 import { format } from "date-fns";
-import { guardarClienteEnFirebase, uploadImage } from "../../firebaseFunctions";
+import {
+  guardarClienteEnFirebase,
+  uploadImage,
+  uploadImageTienda,
+} from "../../firebaseFunctions";
 import { toast } from "react-toastify";
 import { CampoEntrada } from "./CampoEntrada";
 import { miContexto } from "../../../../../context/AppContext";
 
 export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageTiendaPreview, setImageTiendaPreview] = useState(null);
   const [datosCliente, setDatosCliente] = useState({
     image: null,
+    imageTienda: null,
     cpf: "",
     nombreCliente: "",
     direccionCobro: "",
@@ -32,6 +38,9 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     cuotasPagadas: 0,
     formaDePago: "diario",
     fechaFinal: "",
+    valorPico: 0,
+    fechaUltimoAbono: "",
+    totalAbono: 0,
   });
 
   const { setInfoClientes, infoClientes } = useContext(miContexto);
@@ -163,15 +172,33 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     }
   };
 
+  const handleImageTiendaChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setDatosCliente({ ...datosCliente, imageTienda: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageTiendaPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const crearCliente = async (e) => {
     e.preventDefault();
     setIsSubmiting(true);
 
     try {
+      const imageTiendaUrl = await uploadImageTienda({
+        imageTienda: datosCliente.imageTienda,
+        descripcion: datosCliente.descripcion,
+      });
+
       const imageUrl = await uploadImage({
         image: datosCliente.image,
-        cpf: datosCliente.cpf,
+        nombre: datosCliente.nombreCliente,
       });
+
       // Ahora puedes utilizar 'imageUrl' para almacenar la URL de la imagen en la base de datos o donde sea necesario
       const valorPrestamoNum = parseInt(datosCliente.valorPrestamo);
       const porcentajeInteresNum = parseInt(datosCliente.porcentajeInteres);
@@ -198,6 +225,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
 
       const clienteData = {
         imageUrl,
+        imageTiendaUrl,
         datosCliente,
       };
 
@@ -211,6 +239,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     } finally {
       setIsSubmiting(false);
       setisModalCreateCliente(false);
+      window.location.reload();
       toast.success("Cliente agregado con exito");
     }
   };
@@ -325,6 +354,42 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
                     imagePreview ? "Cambiar Foto" : "Agregar Foto del Cliente"
                   }
                   onClick={() => document.getElementById("imageInput").click()}
+                  readOnly // Evitar que se pueda editar directamente el texto
+                />
+              </div>
+
+              {imageTiendaPreview && (
+                <img
+                  src={imageTiendaPreview}
+                  alt="Selected"
+                  className="h-[200px] w-auto rounded-r-md object-cover"
+                />
+              )}
+              <div className="flex w-full h-[40px] border border-gray-400 rounded-md relative">
+                <label
+                  htmlFor="imageInputTienda"
+                  className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400 cursor-pointer"
+                >
+                  <input
+                    type="file"
+                    id="imageInputTienda"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageTiendaChange}
+                  />
+                  <HiOutlinePhotograph size={24} />
+                </label>
+                <input
+                  type="text"
+                  className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
+                  placeholder={
+                    imageTiendaPreview
+                      ? "Cambiar Foto"
+                      : "Agregar Foto de Tienda"
+                  }
+                  onClick={() =>
+                    document.getElementById("imageInputTienda").click()
+                  }
                   readOnly // Evitar que se pueda editar directamente el texto
                 />
               </div>

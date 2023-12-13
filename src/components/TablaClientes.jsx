@@ -8,6 +8,8 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
   const [selectedAbono, setSelectedAbono] = useState(null);
   const [verDetallesCliente, setVerDetallesCliente] = useState(false);
   const [selectedDetallesCliente, setSelectedDetallesCliente] = useState(null);
+  const [clientes, setClientes] = useState(datos);
+
   // const handleEditClick = (admin) => {
   //   if (!usuarioRuta.isAdmin) {
   //     return;
@@ -41,6 +43,15 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
           setIsAbono={setIsAbono}
           selectedAbono={selectedAbono}
           usuarioRuta={usuarioRuta}
+          setSelectedAbono={(updatedAbono) => {
+            setSelectedAbono(updatedAbono);
+            // Actualiza localmente los datos en la tabla
+            setClientes((prevClientes) =>
+              prevClientes.map((cliente) =>
+                cliente.uid === updatedAbono.uid ? updatedAbono : cliente
+              )
+            );
+          }}
         />
       ) : null}
 
@@ -55,7 +66,9 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
           <tr className="bg-red-100 uppercase text-sm">
             <th className="border border-black w-6 px-2 py-1">#</th>
             <th className="border border-black min-w-fit px-2 py-1">Cliente</th>
-            <th className="border border-black w-fit px-2 py-1">abono</th>
+            <th className="border border-black min-w-fit px-2 py-1 whitespace-nowrap">
+              abonó hoy
+            </th>
             <th className="border border-black w-fit px-2 py-1">cuota</th>
             <th className="border border-black w-fit px-2 py-1">c.pag</th>
             <th className="border border-black w-fit px-2 py-1">c.res</th>
@@ -63,8 +76,8 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(datos) && datos.length > 0 ? (
-            datos.map((item, index) => (
+          {Array.isArray(clientes) && clientes.length > 0 ? (
+            clientes.map((item, index) => (
               <tr
                 key={index}
                 className={`${
@@ -102,7 +115,7 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
                   onClick={() => handleDetallesCliente(item)}
                   className="border border-black px-2 w-fit text-center py-1 underline uppercase cursor-pointer"
                 >
-                  detalles
+                  ver
                 </td>
               </tr>
             ))
