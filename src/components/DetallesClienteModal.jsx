@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { FotoDeTiendaModal } from "./FotoDeTiendaModal";
+import { CartonDigitalModal } from "./CartonDigitalModal";
+import { HistorialDePagosModal } from "./HistorialDePagosModal";
 
 export const DetallesClienteModal = ({
   setVerDetallesCliente,
   selectedDetallesCliente,
 }) => {
   const [verFotoDeTienda, setVerFotoDeTienda] = useState(false);
-
+  const [mostrarCartonDigital, setMostrarCartonDigital] = useState(false);
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const ubicacion = {
     latitud: 0,
     longitud: 0,
@@ -25,8 +28,41 @@ export const DetallesClienteModal = ({
 
   const deudaActual = creditoTotal - selectedDetallesCliente.totalAbono;
 
+  const dataTablaHeader = [
+    { titulo: "Fecha Inicial" },
+    { titulo: "fecha final" },
+    { titulo: "forma de pago" },
+    { titulo: "valor del prestamo" },
+    { titulo: "% interes" },
+    { titulo: "deuda total" },
+    { titulo: "cuota diaria" },
+    { titulo: "abono hoy" },
+    { titulo: "valor pico" },
+    { titulo: "abono total" },
+    { titulo: "total cuotas" },
+    { titulo: "cuotas pagadas" },
+    { titulo: "cuotas restantes" },
+    { titulo: "cuotas atrasadas" },
+    { titulo: "debe a la fecha" },
+    { titulo: "deuda restante" },
+  ];
+
   return (
     <>
+      {mostrarCartonDigital ? (
+        <CartonDigitalModal
+          setMostrarCartonDigital={setMostrarCartonDigital}
+          datos={selectedDetallesCliente}
+        />
+      ) : null}
+
+      {mostrarHistorial ? (
+        <HistorialDePagosModal
+          setMostrarHistorial={setMostrarHistorial}
+          datos={selectedDetallesCliente}
+        />
+      ) : null}
+
       {verFotoDeTienda ? (
         <FotoDeTiendaModal
           setVerFotoDeTienda={setVerFotoDeTienda}
@@ -113,52 +149,20 @@ export const DetallesClienteModal = ({
           <table className="w-full mt-2 flex">
             <thead className="w-[50%]">
               <tr className="bg-[#aa7acf] uppercase text-xs flex flex-col border border-black">
-                <th className=" w-full border-b border-black px-2 py-1 ">
-                  Fecha Inicial
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  fecha final
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  forma de pago
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  valor del prestamo
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  % interes
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  deuda total
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  cuota diaria
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  abono hoy
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  valor pico
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  abono total
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  total cuotas
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  cuotas pagadas
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  cuotas restantes
-                </th>
-                <th className=" w-full border-b border-black px-2 py-1">
-                  cuotas atrasadas
-                </th>
-                <th className="w-full border-b border-black px-2 py-1">
-                  debe a la fecha
-                </th>
-                <th className=" w-full px-2 py-1">deuda restante</th>
+                {dataTablaHeader.map((item, index) => {
+                  return (
+                    <th
+                      key={index}
+                      className={
+                        index === dataTablaHeader.length - 1
+                          ? " w-full px-2 py-1"
+                          : "w-full border-b border-black px-2 py-1"
+                      }
+                    >
+                      {item.titulo}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="w-[50%]">
@@ -204,10 +208,16 @@ export const DetallesClienteModal = ({
                     selectedDetallesCliente.cuotasPagadas}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  falta agregar
+                  {selectedDetallesCliente.cuotasAtrasadas}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  falta agregar
+                  {`$${
+                    selectedDetallesCliente.cuotasAtrasadas > 0
+                      ? selectedDetallesCliente.pagoDiario *
+                          selectedDetallesCliente.cuotasAtrasadas -
+                        selectedDetallesCliente.valorPico
+                      : 0
+                  }`}
                 </td>
                 <td className="w-full px-2 py-1 text-center font-bold">
                   {`$${deudaActual}`}
@@ -215,6 +225,23 @@ export const DetallesClienteModal = ({
               </tr>
             </tbody>
           </table>
+          <div className="flex w-full justify-between">
+            <button
+              type="button"
+              className="bg-[#8131bd] mt-4 mx-auto w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+              onClick={() => setMostrarCartonDigital(true)}
+            >
+              Carton Digital
+            </button>
+
+            <button
+              type="button"
+              className="bg-[#8131bd] mt-4 mx-auto w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+              onClick={() => setMostrarHistorial(true)}
+            >
+              Historial de Pagos
+            </button>
+          </div>
         </div>
       </div>
     </>

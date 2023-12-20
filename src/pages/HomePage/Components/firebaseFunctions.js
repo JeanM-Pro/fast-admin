@@ -46,6 +46,9 @@ export const guardarClienteEnFirebase = async (
       valorPico: clienteData.datosCliente.valorPico,
       fechaUltimoAbono: clienteData.datosCliente.fechaUltimoAbono,
       totalAbono: clienteData.datosCliente.totalAbono,
+      cuotasAtrasadas: clienteData.datosCliente.cuotasAtrasadas,
+      actualizado: clienteData.datosCliente.actualizado,
+      historialPagos: clienteData.datosCliente.historialPagos,
     };
 
     await addDoc(clienteRef, docData);

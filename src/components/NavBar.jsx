@@ -1,14 +1,20 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import logoNav from "../images/logonav.png";
 import { useState } from "react";
 import logoLetra from "../images/logoLetra.png";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { ImUsers } from "react-icons/im";
 import { AiFillHome } from "react-icons/ai";
+import { MoonLoader } from "react-spinners";
+import { toast } from "react-toastify";
+import { auth } from "../firebase/firebaseConfig";
+import { BiSolidLogOut } from "react-icons/bi";
 
 export const Navbar = () => {
   const [toggleNavbar, setToggleNavbar] = useState(false);
   const [animationNavbar, setAnimationNavbar] = useState(false);
+  const [isLogouting, setIsLogouting] = useState(false);
+  const navigate = useNavigate;
 
   const handleToggleNavbar = () => {
     setAnimationNavbar(!animationNavbar);
@@ -22,6 +28,19 @@ export const Navbar = () => {
   };
   const location = useLocation();
   const ruta = location.pathname;
+
+  const handleLogout = async () => {
+    setIsLogouting(true);
+    try {
+      await auth.signOut();
+      toast.success("Sesión cerrada exitosamente.");
+      navigate("/login");
+      setIsLogouting(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   return (
     <>
@@ -102,6 +121,20 @@ export const Navbar = () => {
                 <ImUsers className="mr-2" size={25} />
                 Trabajadores
               </NavLink>
+
+              <button
+                type="button"
+                className="bg-[#8131bd] text-lg mt-4 w-fit px-5 font-semibold text-white py-3 rounded-3xl flex justify-center items-center min-w-[80px]"
+                onClick={handleLogout}
+                disabled={isLogouting}
+              >
+                <BiSolidLogOut className="mr-2" size={25} />
+                {isLogouting ? (
+                  <MoonLoader size={20} color="#ffffff" />
+                ) : (
+                  "Cerrar Sesion"
+                )}
+              </button>
             </>
           }
         </div>

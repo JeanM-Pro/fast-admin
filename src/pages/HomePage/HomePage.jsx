@@ -1,15 +1,14 @@
-import { toast } from "react-toastify";
 import { Navbar } from "../../components/NavBar";
 import { auth } from "../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
-import { MoonLoader } from "react-spinners";
+import { useState, useContext, useEffect } from "react";
 import { miContexto } from "../../context/AppContext";
 import { Tabla } from "../../components/Tabla";
 import { RegisterRutaPage } from "./Components/Modals/RegisterRutaModal";
 import { TablaAdministradores } from "../../components/TablaAdministradores";
 import { CrearClienteModal } from "./Components/Modals/CrearClientesModal/CrearClienteModal";
 import { TablaClientes } from "../../components/TablaClientes";
+import { doc, getFirestore, updateDoc } from "firebase/firestore";
 
 export const HomePage = () => {
   const [isLogouting, setIsLogouting] = useState(false);
@@ -17,22 +16,85 @@ export const HomePage = () => {
   const [isModalCreateCliente, setisModalCreateCliente] = useState(false);
   const navigate = useNavigate();
   const user = auth.currentUser;
-  const { usersAdminData, userData, rutasData, usuarioRuta, infoClientes } =
-    useContext(miContexto);
+  const {
+    usersAdminData,
+    userData,
+    rutasData,
+    usuarioRuta,
+    infoClientes,
+    setInfoClientes,
+  } = useContext(miContexto);
 
-  const handleLogout = async () => {
-    setIsLogouting(true);
-    try {
-      await auth.signOut();
-      toast.success("Sesión cerrada exitosamente.");
-      navigate("/login");
-      setIsLogouting(false);
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
+  console.log(rutasData);
 
-  console.log(infoClientes);
+  useEffect(() => {
+    const actualizarCuotas = async () => {
+      if (infoClientes) {
+        const db = getFirestore();
+        const batch = [];
+
+        // Utilizar una variable temporal para acumular los cambios
+        let infoClientesActualizado = infoClientes.map((cliente) => {
+          const { abono, fechaUltimoAbono } = cliente;
+          const fechaActual = new Date();
+          const fechaUltimoAbonoDate = new Date(fechaUltimoAbono);
+          fechaActual.setHours(0, 0, 0, 0);
+          fechaUltimoAbonoDate.setHours(0, 0, 0, 0);
+
+          if (abono === 0 && fechaUltimoAbonoDate < fechaActual) {
+            const cuotasAtrasadasActualizadas = cliente.cuotasAtrasadas + 1;
+            batch.push(
+              updateDoc(
+                doc(
+                  db,
+                  "admin_users",
+                  usuarioRuta.adminUid,
+                  "rutas",
+                  usuarioRuta.uid,
+                  "clientes",
+                  cliente.uid
+                ),
+                {
+                  cuotasAtrasadas: cuotasAtrasadasActualizadas,
+                }
+              )
+            );
+            return { ...cliente, cuotasAtrasadas: cuotasAtrasadasActualizadas };
+          } else if (abono > 0 && fechaUltimoAbonoDate < fechaActual) {
+            batch.push(
+              updateDoc(
+                doc(
+                  db,
+                  "admin_users",
+                  usuarioRuta.adminUid,
+                  "rutas",
+                  usuarioRuta.uid,
+                  "clientes",
+                  cliente.uid
+                ),
+                {
+                  abono: 0,
+                }
+              )
+            );
+            return { ...cliente, abono: 0 };
+          }
+
+          return cliente;
+        });
+
+        // Actualizar localmente solo después de completar el bucle
+        setInfoClientes(infoClientesActualizado);
+
+        // Actualizar en Firebase
+        await Promise.all(batch);
+      }
+    };
+
+    actualizarCuotas();
+  }, []);
+
+  const posicionArroba = userData?.email.indexOf("@");
 
   return (
     <>
@@ -49,19 +111,6 @@ export const HomePage = () => {
 
       <Navbar />
       <div className="w-full min-h-screen bg-gray-200 pt-16 px-4 md:px-8">
-        <button
-          type="button"
-          className="bg-[#8131bd] w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-          onClick={handleLogout}
-          disabled={isLogouting}
-        >
-          {isLogouting ? (
-            <MoonLoader size={20} color="#ffffff" />
-          ) : (
-            "Cerrar Sesion"
-          )}
-        </button>
-
         {user?.email === "jeancenteno54@fastadmin.com" && (
           <button
             type="button"
@@ -104,7 +153,16 @@ export const HomePage = () => {
           </button>
         )}
 
-        {userData && <h2>{userData.email}</h2>}
+        {userData && (
+          <h2 className="text-center text-lg font-bold uppercase mt-4">
+            {`Administrador: ${
+              posicionArroba !== -1
+                ? userData.email.substring(0, posicionArroba)
+                : null
+            }`}
+          </h2>
+        )}
+
         {usuarioRuta && (
           <h2 className="text-center text-lg font-bold uppercase mt-4">
             {usuarioRuta.nombreRuta}

@@ -20,6 +20,8 @@ import { miContexto } from "../../../../../context/AppContext";
 export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageTiendaPreview, setImageTiendaPreview] = useState(null);
+  const fechaDeAbono = new Date();
+  const fechaFormateada = fechaDeAbono.toDateString();
   const [datosCliente, setDatosCliente] = useState({
     image: null,
     imageTienda: null,
@@ -39,8 +41,11 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     formaDePago: "diario",
     fechaFinal: "",
     valorPico: 0,
-    fechaUltimoAbono: "",
+    fechaUltimoAbono: fechaFormateada,
     totalAbono: 0,
+    cuotasAtrasadas: 0,
+    actualizado: false,
+    historialPagos: [],
   });
 
   const { setInfoClientes, infoClientes } = useContext(miContexto);

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MoonLoader } from "react-spinners";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
-import { format } from "date-fns";
 
 export const AbonoModal = ({
   setIsAbono,
@@ -34,29 +33,46 @@ export const AbonoModal = ({
       const docSnapshot = await getDoc(clienteRef);
       const clienteData = docSnapshot.data();
 
+      const fechaDeAbono = new Date();
+      const fechaFormateada = fechaDeAbono.toDateString();
+
       //Calcular las cuotas y el valor pico
 
-      const fechaDeAbono = new Date();
       const totalAbono = selectedAbono.valorPico + abono;
       const vecesSuperado = Math.floor(totalAbono / selectedAbono.pagoDiario);
       const sobrante = totalAbono % selectedAbono.pagoDiario;
+
+      // Calcular cuotas a restar, asegurándote de que no sea un número negativo
+      const cuotasAtrasadasToSubtract = Math.max(
+        0,
+        selectedAbono.cuotasAtrasadas - vecesSuperado
+      );
+
+      const nuevoHistorial = {
+        abono: abono,
+        fecha: new Date(),
+      };
 
       // Actualiza los datos en el documento manteniendo los datos originales no editados
       await updateDoc(clienteRef, {
         ...clienteData,
         abono: abono,
         cuotasPagadas: selectedAbono.cuotasPagadas + vecesSuperado,
-        fechaUltimoAbono: format(fechaDeAbono, "dd/MM/yyyy"),
+        fechaUltimoAbono: fechaFormateada,
         valorPico: sobrante,
         totalAbono: selectedAbono.totalAbono + abono,
+        cuotasAtrasadas: cuotasAtrasadasToSubtract,
+        historialPagos: [...clienteData.historialPagos, nuevoHistorial],
       });
       setSelectedAbono({
         ...selectedAbono,
         abono: abono,
         cuotasPagadas: selectedAbono.cuotasPagadas + vecesSuperado,
-        fechaUltimoAbono: format(fechaDeAbono, "dd/MM/yyyy"),
+        fechaUltimoAbono: fechaFormateada,
         valorPico: sobrante,
         totalAbono: selectedAbono.totalAbono + abono,
+        cuotasAtrasadas: cuotasAtrasadasToSubtract,
+        historialPagos: [...clienteData.historialPagos, nuevoHistorial],
       });
       setIsAbono(false);
     } catch (error) {

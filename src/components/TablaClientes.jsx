@@ -63,7 +63,7 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
       ) : null}
       <table className="min-w-full mt-2 bg-white">
         <thead>
-          <tr className="bg-red-100 uppercase text-sm">
+          <tr className="bg-[#8131bd] uppercase text-sm text-white">
             <th className="border border-black w-6 px-2 py-1">#</th>
             <th className="border border-black min-w-fit px-2 py-1">Cliente</th>
             <th className="border border-black min-w-fit px-2 py-1 whitespace-nowrap">
@@ -82,38 +82,38 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
                 key={index}
                 className={`${
                   index % 2 === 0 ? "bg-gray-300" : "bg-gray-100"
-                } border border-black text-sm font-semibold`}
+                } border border-black text-sm font-semibold py-2`}
               >
-                <td className="border border-black text-center px-2 py-1">
+                <td className="border border-black text-center px-2 py-2">
                   {index + 1}
                 </td>
 
-                <td className="items-center uppercase border-black min-w-max flex justify-center px-1 py-1">
+                <td className="items-center uppercase border-black min-w-max flex justify-center px-1 py-2">
                   {item.nombreCliente}
                 </td>
 
                 <td
-                  className="border border-black px-2 w-fit text-center py-1"
+                  className="border border-black px-2 w-fit text-center py-2"
                   onClick={() => handleAbono(item)}
                 >
                   ${item.abono}
                 </td>
 
-                <td className="border border-black px-2 w-fit text-center py-1">
+                <td className="border border-black px-2 w-fit text-center py-2">
                   {`$${item.pagoDiario}`}
                 </td>
 
-                <td className="border border-black px-2 w-fit text-center py-1">
+                <td className="border border-black px-2 w-fit text-center py-2">
                   {item.cuotasPagadas}
                 </td>
 
-                <td className="border border-black px-2 w-fit text-center py-1">
+                <td className="border border-black px-2 w-fit text-center py-2">
                   {item.cuotasPactadas - item.cuotasPagadas}
                 </td>
 
                 <td
                   onClick={() => handleDetallesCliente(item)}
-                  className="border border-black px-2 w-fit text-center py-1 underline uppercase cursor-pointer"
+                  className="border border-black px-2 w-fit text-center py-2 underline uppercase cursor-pointer"
                 >
                   ver
                 </td>

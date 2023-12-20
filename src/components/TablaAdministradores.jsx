@@ -11,7 +11,7 @@ export const TablaAdministradores = ({ datos }) => {
 
   return (
     <>
-      <table className="min-w-full mt-8 bg-white">
+      <table className="min-w-full mt-4 bg-white">
         <thead>
           <tr className="bg-red-100">
             <th className="border border-black w-6 px-2 py-1">#</th>
@@ -19,6 +19,7 @@ export const TablaAdministradores = ({ datos }) => {
             <th className="border border-black w-10 px-2 py-1">Responsable</th>
             <th className="border border-black w-10 px-2 py-1">Editar</th>
             <th className="border border-black w-10 px-2 py-1">Eliminar</th>
+            <th className="border border-black w-10 px-2 py-1">Detalles</th>
           </tr>
         </thead>
         <tbody>
@@ -36,7 +37,7 @@ export const TablaAdministradores = ({ datos }) => {
                 <td className="items-center border-black flex justify-center px-1 py-1">
                   {item.nombreRuta}
                 </td>
-                <td className="border border-black px-2 w-10 text-center py-1">
+                <td className="border border-black px-2 whitespace-nowrap text-center py-1 uppercase">
                   {item.responsable}
                 </td>
 
@@ -46,11 +47,16 @@ export const TablaAdministradores = ({ datos }) => {
                     className="cursor-pointer my-0 mx-auto"
                   />
                 </td>
+
                 <td className="border border-black w-10  px-2 py-1">
                   <AiOutlineDelete
                     className="cursor-pointer my-0 mx-auto"
                     onClick={() => handleDeleteClick(item)}
                   />
+                </td>
+
+                <td className="border cursor-pointer underline border-black px-2 whitespace-nowrap text-center py-1">
+                  Ver
                 </td>
               </tr>
             ))

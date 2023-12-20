@@ -142,6 +142,8 @@ export const AppContext = ({ children }) => {
     fetchData();
   }, [usuarioRuta]);
 
+  // --------------------------
+
   return (
     <miContexto.Provider
       value={{
