@@ -6,14 +6,18 @@ import { miContexto } from "../../context/AppContext";
 import { Tabla } from "../../components/Tabla";
 import { RegisterRutaPage } from "./Components/Modals/RegisterRutaModal";
 import { TablaAdministradores } from "../../components/TablaAdministradores";
-import { CrearClienteModal } from "./Components/Modals/CrearClientesModal/CrearClienteModal";
+import { CrearClienteModal } from "../../components/CrearClienteModal";
 import { TablaClientes } from "../../components/TablaClientes";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import { CrearClienteModalNew } from "./Components/Modals/CrearClientesModal/CrearClienteModalNew";
+import { CrearClienteExistenteModal } from "../../components/CrearClienteExistenteModal";
 
 export const HomePage = () => {
-  const [isLogouting, setIsLogouting] = useState(false);
   const [isModalCreateRuta, setIsModalCreateRuta] = useState(false);
+  const [isModalCreateClienteNew, setisModalCreateClienteNew] = useState(false);
   const [isModalCreateCliente, setisModalCreateCliente] = useState(false);
+  const [isModalCreateClienteExistente, setIsModalCreateClienteExistente] =
+    useState(false);
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -21,11 +25,10 @@ export const HomePage = () => {
     userData,
     rutasData,
     usuarioRuta,
+    setUsuarioRuta,
     infoClientes,
     setInfoClientes,
   } = useContext(miContexto);
-
-  console.log(rutasData);
 
   useEffect(() => {
     const actualizarCuotas = async () => {
@@ -92,6 +95,7 @@ export const HomePage = () => {
     };
 
     actualizarCuotas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const posicionArroba = userData?.email.indexOf("@");
@@ -104,8 +108,25 @@ export const HomePage = () => {
 
       {isModalCreateCliente ? (
         <CrearClienteModal
+          setisModalCreateClienteNew={setisModalCreateClienteNew}
           setisModalCreateCliente={setisModalCreateCliente}
+          setIsModalCreateClienteExistente={setIsModalCreateClienteExistente}
+        />
+      ) : null}
+
+      {isModalCreateClienteNew ? (
+        <CrearClienteModalNew
+          setisModalCreateClienteNew={setisModalCreateClienteNew}
           usuarioRuta={usuarioRuta}
+          setUsuarioRuta={setUsuarioRuta}
+        />
+      ) : null}
+
+      {isModalCreateClienteExistente ? (
+        <CrearClienteExistenteModal
+          setIsModalCreateClienteExistente={setIsModalCreateClienteExistente}
+          usuarioRuta={usuarioRuta}
+          setUsuarioRuta={setUsuarioRuta}
         />
       ) : null}
 
@@ -116,7 +137,6 @@ export const HomePage = () => {
             type="button"
             className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
             onClick={() => navigate("/registerAdm")}
-            disabled={isLogouting}
           >
             Crear Admn
           </button>
@@ -144,13 +164,24 @@ export const HomePage = () => {
         )}
 
         {usuarioRuta && (
-          <button
-            type="button"
-            className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-            onClick={() => setisModalCreateCliente(true)}
-          >
-            Agregar cliente
-          </button>
+          <div className="w-full flex justify-between">
+            <button
+              type="button"
+              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+              onClick={() => setisModalCreateCliente(true)}
+            >
+              Agregar cliente
+            </button>
+
+            <div className="flex flex-col items-center mt-2">
+              <span className="text-xl font-bold leading-3">
+                ${usuarioRuta.saldoInicial}
+              </span>
+              <span className="text-xs md:text-base md:font-semibold font-bold">
+                SALDO DISPONIBLE
+              </span>
+            </div>
+          </div>
         )}
 
         {userData && (
@@ -183,7 +214,11 @@ export const HomePage = () => {
 
         {infoClientes && (
           <div className="w-full px-2 overflow-x-auto py-2">
-            <TablaClientes datos={infoClientes} usuarioRuta={usuarioRuta} />
+            <TablaClientes
+              datos={infoClientes}
+              usuarioRuta={usuarioRuta}
+              setUsuarioRuta={setUsuarioRuta}
+            />
           </div>
         )}
       </div>

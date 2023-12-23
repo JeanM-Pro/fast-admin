@@ -51,7 +51,29 @@ export const guardarClienteEnFirebase = async (
       historialPagos: clienteData.datosCliente.historialPagos,
     };
 
+    const allClientsRef = collection(
+      db,
+      "admin_users",
+      usuarioRuta.adminUid,
+      "rutas",
+      usuarioRuta.uid,
+      "allClients"
+    );
+
+    const docDataAllClients = {
+      cpf: clienteData.datosCliente.cpf,
+      nombreCliente: clienteData.datosCliente.nombreCliente,
+      direccionCobro: clienteData.datosCliente.direccionCobro,
+      telefono: clienteData.datosCliente.telefono,
+      direccion: clienteData.datosCliente.direccion,
+      descripcion: clienteData.datosCliente.descripcion,
+      ubicacion: clienteData.datosCliente.ubicacion,
+      imageUrl: clienteData.imageUrl,
+      imageTienda: clienteData.imageTiendaUrl,
+    };
+
     await addDoc(clienteRef, docData);
+    await addDoc(allClientsRef, docDataAllClients);
     setInfoClientes([...infoClientes, docData]);
   } catch (error) {
     console.error("Error al guardar el cliente en Firebase:", error);

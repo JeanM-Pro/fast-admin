@@ -4,14 +4,16 @@ import {
   AiOutlineUser,
 } from "react-icons/ai";
 import { FaRoute } from "react-icons/fa";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { TbLock } from "react-icons/tb";
 import { MoonLoader } from "react-spinners";
 import { IoIosClose } from "react-icons/io";
+import { CiDollar } from "react-icons/ci";
 import { auth } from "../../../../firebase/firebaseConfig";
 import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
+import { miContexto } from "../../../../context/AppContext";
 
 export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
   const [usuario, setUsuario] = useState("");
@@ -20,7 +22,8 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [isButtonPassword, setIsButtonPassword] = useState(true);
   const [responsable, setResponsable] = useState("");
-
+  const [saldoInicial, setSaldoInicial] = useState(0);
+  const { setRutasData, rutasData, handleLogout } = useContext(miContexto);
   const userAdmin = auth.currentUser;
 
   const crearRuta = async (e) => {
@@ -58,7 +61,22 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
           isAdmin: false,
           adminUid: userAdmin?.uid,
           responsable: responsable,
+          saldoInicial: saldoInicial,
+          historialGastos: [],
         });
+
+        setRutasData([
+          ...rutasData,
+          {
+            uid: uid,
+            nombreRuta: usuario,
+            isAdmin: false,
+            adminUid: userAdmin?.uid,
+            responsable: responsable,
+            saldoInicial: saldoInicial,
+            historialGastos: [],
+          },
+        ]);
 
         // Restablecer los estados y cerrar el modal
         setUsuario("");
@@ -66,7 +84,8 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
         setContrasenaVerify("");
         setIsSubmiting(false);
         setIsModalCreateRuta(false);
-        toast.success("Ruta creada exitosamente");
+        handleLogout();
+        toast.success("Ruta creada exitosamente, ahora inicie sesion");
       }
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
@@ -107,6 +126,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
                   className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder="Nombre de Ruta"
                   onChange={(e) => setUsuario(e.target.value)}
+                  required
                 />
               </div>
               <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
@@ -118,6 +138,19 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
                   className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder="Nombre del responsable"
                   onChange={(e) => setResponsable(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
+                <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+                  <CiDollar size={24} />
+                </div>
+                <input
+                  type="number"
+                  className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
+                  placeholder="Saldo Inicial"
+                  onChange={(e) => setSaldoInicial(e.target.value)}
+                  required
                 />
               </div>
               <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
@@ -129,6 +162,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
                   className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder="Contraseña"
                   onChange={(e) => setContrasena(e.target.value)}
+                  required
                 />
                 <div className="h-full w-[40px] bg-white rounded-md flex items-center justify-center ">
                   {isButtonPassword ? (
@@ -155,6 +189,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
                   className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder="Verificar Contraseña"
                   onChange={(e) => setContrasenaVerify(e.target.value)}
+                  required
                 />
                 <div className="h-full w-[40px] bg-white rounded-md flex items-center justify-center ">
                   {isButtonPassword ? (

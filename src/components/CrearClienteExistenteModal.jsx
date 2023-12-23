@@ -1,37 +1,50 @@
-import { useContext, useState } from "react";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
+import React, { useContext, useEffect, useState } from "react";
+import { IoIosClose } from "react-icons/io";
+import { miContexto } from "../context/AppContext";
+import { formatDistance } from "date-fns";
+import { guardarClienteEnFirebase } from "../pages/HomePage/Components/firebaseFunctions";
+import { toast } from "react-toastify";
 import { AiOutlineUser } from "react-icons/ai";
 import { FaRegAddressBook, FaRoute } from "react-icons/fa";
-import { IoIosClose } from "react-icons/io";
 import { IoLocationOutline, IoStorefrontOutline } from "react-icons/io5";
-import { MoonLoader } from "react-spinners";
 import { BsTelephone } from "react-icons/bs";
 import { HiOutlineIdentification } from "react-icons/hi2";
 import { HiOutlinePhotograph } from "react-icons/hi";
-import { format } from "date-fns";
-import {
-  guardarClienteEnFirebase,
-  uploadImage,
-  uploadImageTienda,
-} from "../../firebaseFunctions";
-import { toast } from "react-toastify";
-import { CampoEntrada } from "./CampoEntrada";
-import { miContexto } from "../../../../../context/AppContext";
+import { MoonLoader } from "react-spinners";
+import { CampoEntrada } from "../pages/HomePage/Components/Modals/CrearClientesModal/CampoEntrada";
 
-export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
+export const CrearClienteExistenteModal = ({
+  setIsModalCreateClienteExistente,
+  usuarioRuta,
+  setUsuarioRuta,
+}) => {
+  const { setInfoClientes, infoClientes } = useContext(miContexto);
+  const [allClients, setAllClients] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageTiendaPreview, setImageTiendaPreview] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCliente, setSelectedCliente] = useState(null);
+  const [showInputSearch, setShowInputSearch] = useState(true);
   const fechaDeAbono = new Date();
   const fechaFormateada = fechaDeAbono.toDateString();
   const [datosCliente, setDatosCliente] = useState({
-    image: null,
-    imageTienda: null,
+    image: selectedCliente?.imageUrl,
+    imageTienda: selectedCliente?.imageTienda,
     cpf: "",
-    nombreCliente: "",
-    direccionCobro: "",
-    telefono: "",
-    direccion: "",
-    descripcion: "",
-    ubicacion: "",
+    nombreCliente: selectedCliente?.nombreCliente,
+    direccionCobro: selectedCliente?.direccionCobro,
+    telefono: selectedCliente?.telefono,
+    direccion: selectedCliente?.direccion,
+    descripcion: selectedCliente?.descripcion,
+    ubicacion: selectedCliente?.ubicacion,
     valorPrestamo: 1,
     porcentajeInteres: 0,
     cuotasPactadas: 1,
@@ -47,12 +60,46 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     actualizado: false,
     historialPagos: [],
   });
-
-  const { setInfoClientes, infoClientes } = useContext(miContexto);
-
   const [isSubmiting, setIsSubmiting] = useState(false);
-
   const opcionesFormaPago = ["diario", "semanal", "mensual"];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const db = getFirestore();
+        if (usuarioRuta) {
+          const querySnapshot = await getDocs(
+            collection(
+              db,
+              "admin_users",
+              usuarioRuta.adminUid,
+              "rutas",
+              usuarioRuta.uid,
+              "allClients"
+            )
+          );
+          const data = querySnapshot.docs.map((doc) => {
+            const uid = doc.id;
+            const clienteData = doc.data();
+            return { uid, ...clienteData };
+          });
+          setAllClients(data);
+        }
+      } catch (error) {
+        console.error("Error fetching data from Firebase:", error);
+      }
+    };
+
+    fetchData();
+  }, [usuarioRuta]);
+
+  console.log(selectedCliente);
+
+  const handleSelectedCliente = (cliente) => {
+    setSelectedCliente(cliente);
+    setShowInputSearch(false);
+    setSearchTerm("");
+  };
 
   const handleValorPrestamoChange = (e) => {
     const valorPrestamoNum = parseInt(e.target.value);
@@ -112,7 +159,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
       }
 
       // Formatear la fecha
-      const fechaFinalFormateada = format(fechaFinal, "dd/MM/yyyy");
+      const fechaFinalFormateada = formatDistance(fechaFinal, "dd/MM/yyyy");
 
       return {
         ...prevDatosCliente,
@@ -121,48 +168,6 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
         fechaFinal: fechaFinalFormateada,
       };
     });
-  };
-
-  function obtenerFechaActual() {
-    const fecha = new Date();
-
-    // Obtener día, mes y año
-    const dia = fecha.getDate();
-    const mes = fecha.getMonth() + 1; // Los meses comienzan desde 0, por lo que sumamos 1
-    const anio = fecha.getFullYear();
-
-    // Formatear la fecha como dd/mm/aaaa
-    const fechaFormateada = `${formatoDosDigitos(dia)}/${formatoDosDigitos(
-      mes
-    )}/${anio}`;
-
-    return fechaFormateada;
-  }
-
-  function formatoDosDigitos(numero) {
-    return numero < 10 ? `0${numero}` : numero;
-  }
-
-  const fechaActual = obtenerFechaActual();
-
-  // Obtener la ubicación actual del usuario
-  const obtenerUbicacionActual = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setDatosCliente({
-            ...datosCliente,
-            ubicacion: `${latitude}, ${longitude}`,
-          });
-        },
-        (error) => {
-          console.error("Error obteniendo la ubicación:", error);
-        }
-      );
-    } else {
-      console.error("La geolocalización no está soportada por este navegador.");
-    }
   };
 
   const handleImageChange = (e) => {
@@ -189,22 +194,78 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     }
   };
 
+  function obtenerFechaActual() {
+    const fecha = new Date();
+
+    // Obtener día, mes y año
+    const dia = fecha.getDate();
+    const mes = fecha.getMonth() + 1; // Los meses comienzan desde 0, por lo que sumamos 1
+    const anio = fecha.getFullYear();
+
+    // Formatear la fecha como dd/mm/aaaa
+    const fechaFormateada = `${formatoDosDigitos(dia)}/${formatoDosDigitos(
+      mes
+    )}/${anio}`;
+
+    return fechaFormateada;
+  }
+
+  function formatoDosDigitos(numero) {
+    return numero < 10 ? `0${numero}` : numero;
+  }
+
+  const fechaActual = obtenerFechaActual();
+
+  const obtenerUbicacionActual = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setDatosCliente({
+            ...datosCliente,
+            ubicacion: `${latitude}, ${longitude}`,
+          });
+        },
+        (error) => {
+          console.error("Error obteniendo la ubicación:", error);
+        }
+      );
+    } else {
+      console.error("La geolocalización no está soportada por este navegador.");
+    }
+  };
+
   const crearCliente = async (e) => {
     e.preventDefault();
     setIsSubmiting(true);
+    const db = getFirestore();
 
     try {
-      const imageTiendaUrl = await uploadImageTienda({
-        imageTienda: datosCliente.imageTienda,
-        descripcion: datosCliente.descripcion,
+      // Restar prestamo al saldo disponible en firebase
+
+      const rutaRef = doc(
+        db,
+        "admin_users",
+        usuarioRuta.adminUid,
+        "rutas",
+        usuarioRuta.uid
+      );
+
+      const rutaSnapshot = await getDoc(rutaRef);
+      const rutaData = rutaSnapshot.data();
+
+      const saldoViejoNum = parseInt(usuarioRuta.saldoInicial);
+      const saldoNuevo = saldoViejoNum - datosCliente.valorPrestamo;
+
+      await updateDoc(rutaRef, {
+        ...rutaData,
+        saldoInicial: saldoNuevo,
       });
 
-      const imageUrl = await uploadImage({
-        image: datosCliente.image,
-        nombre: datosCliente.nombreCliente,
-      });
+      // Restar prestamo al saldo disponible localmente
 
-      // Ahora puedes utilizar 'imageUrl' para almacenar la URL de la imagen en la base de datos o donde sea necesario
+      setUsuarioRuta({ ...usuarioRuta, saldoInicial: saldoNuevo });
+
       const valorPrestamoNum = parseInt(datosCliente.valorPrestamo);
       const porcentajeInteresNum = parseInt(datosCliente.porcentajeInteres);
       const cuotasPactadasNum = parseInt(datosCliente.cuotasPactadas);
@@ -229,8 +290,8 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
       setDatosCliente({ ...datosCliente, fechaFinal: fechaFinalCalculada });
 
       const clienteData = {
-        imageUrl,
-        imageTiendaUrl,
+        imageUrl: datosCliente.image,
+        imageTiendaUrl: datosCliente.imageTienda,
         datosCliente,
       };
 
@@ -243,7 +304,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
       );
     } finally {
       setIsSubmiting(false);
-      setisModalCreateCliente(false);
+      setIsModalCreateClienteExistente(false);
       window.location.reload();
       toast.success("Cliente agregado con exito");
     }
@@ -268,14 +329,14 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
     {
       icono: <HiOutlineIdentification size={24} />,
       placeholder: "CPF",
-      valor: datosCliente.cpf,
+      valor: datosCliente?.cpf || "",
       onChange: (e) =>
         setDatosCliente({ ...datosCliente, cpf: e.target.value }),
     },
     {
       icono: <AiOutlineUser size={24} />,
       placeholder: "Nombre del Cliente",
-      valor: datosCliente.nombreCliente,
+      valor: datosCliente.nombreCliente || "",
       onChange: (e) =>
         setDatosCliente({ ...datosCliente, nombreCliente: e.target.value }),
     },
@@ -320,20 +381,51 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
   ];
 
   return (
-    <>
-      <div className="w-full min-h-screen h-screen z-10 bg-black bg-opacity-50 px-2 md:px-8 flex justify-center items-center fixed ">
-        <div className="bg-gray-200 w-[400px] p-4 rounded-md relative max-h-[90%] overflow-y-auto">
-          <IoIosClose
-            className="absolute right-0 top-0 cursor-pointer"
-            size={40}
-            onClick={() => setisModalCreateCliente(false)}
+    <div className="w-full min-h-screen h-screen z-10 bg-black bg-opacity-50 px-2 md:px-8 flex justify-center items-center fixed ">
+      <div className="bg-gray-200 w-[400px] p-4 rounded-md relative max-h-[90%] overflow-y-auto">
+        <IoIosClose
+          className="absolute right-0 top-0 cursor-pointer"
+          size={40}
+          onClick={() => setIsModalCreateClienteExistente(false)}
+        />
+        <h2 className="text-center text-xl font-semibold">Cliente Existente</h2>
+
+        {showInputSearch ? (
+          <input
+            type="text"
+            placeholder="Ingresar nombre de cliente"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-2 mt-2 border rounded-md"
           />
-          <h2 className="text-center text-xl font-semibold">Crear Cliente</h2>
+        ) : null}
+
+        {searchTerm &&
+          allClients &&
+          allClients
+            .filter((cliente) =>
+              cliente.nombreCliente
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+            )
+            .map((cliente) => (
+              <div
+                key={cliente.uid}
+                className="mt-1 p-2 rounded-md cursor-pointer border border-[#8131bd]"
+                onClick={() => handleSelectedCliente(cliente)}
+              >
+                <span className="uppercase font-semibold">
+                  {cliente.nombreCliente}
+                </span>
+              </div>
+            ))}
+
+        {!showInputSearch && (
           <form onSubmit={crearCliente} className="w-full mt-2">
             <div className="w-full flex flex-col gap-2 items-center">
-              {imagePreview && (
+              {selectedCliente && (
                 <img
-                  src={imagePreview}
+                  src={selectedCliente.imageUrl}
                   alt="Selected"
                   className="h-[200px] w-auto rounded-r-md object-cover"
                 />
@@ -356,16 +448,18 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
                   type="text"
                   className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder={
-                    imagePreview ? "Cambiar Foto" : "Agregar Foto del Cliente"
+                    imagePreview || selectedCliente?.imageUrl
+                      ? "Cambiar Foto"
+                      : "Agregar Foto del Cliente"
                   }
                   onClick={() => document.getElementById("imageInput").click()}
                   readOnly // Evitar que se pueda editar directamente el texto
                 />
               </div>
 
-              {imageTiendaPreview && (
+              {selectedCliente && (
                 <img
-                  src={imageTiendaPreview}
+                  src={selectedCliente.imageTienda}
                   alt="Selected"
                   className="h-[200px] w-auto rounded-r-md object-cover"
                 />
@@ -388,7 +482,7 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
                   type="text"
                   className="flex-1 rounded-r-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder={
-                    imageTiendaPreview
+                    imageTiendaPreview || selectedCliente.imageTienda
                       ? "Cambiar Foto"
                       : "Agregar Foto de Tienda"
                   }
@@ -513,8 +607,8 @@ export const CrearClienteModal = ({ setisModalCreateCliente, usuarioRuta }) => {
               </button>
             </div>
           </form>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };

@@ -103,21 +103,21 @@ export const DetallesClienteModal = ({
             </span>
           </p>
 
-          <p className="uppercase font-semibold break-all text-sm">
+          <p className="uppercase font-semibold text-sm whitespace-pre-line">
             direccion:{" "}
             <span className="font-bold">
               {selectedDetallesCliente.direccion}
             </span>
           </p>
 
-          <p className="uppercase font-semibold break-all">
+          <p className="uppercase font-semibold whitespace-pre-line">
             direccion de cobro:{" "}
             <span className="font-bold">
               {selectedDetallesCliente.direccionCobro}
             </span>
           </p>
 
-          <p className="uppercase font-semibold mt-1">
+          <p className="uppercase font-semibold mt-1 whitespace-pre-line">
             Descripcion:{" "}
             <span className="font-bold">
               {selectedDetallesCliente.descripcion}

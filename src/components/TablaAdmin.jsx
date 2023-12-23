@@ -13,7 +13,7 @@ export const Tabla = ({ datos }) => {
     <>
       <table className="min-w-full mt-8 bg-white">
         <thead>
-          <tr className="bg-red-100">
+          <tr className="bg-[#8131bd] text-white">
             <th className="border border-black w-6 px-2 py-1">#</th>
             <th className="border border-black w-10 px-2 py-1">email</th>
             <th className="border border-black w-10 px-2 py-1">uid</th>

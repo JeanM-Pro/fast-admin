@@ -1,6 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { auth } from "../firebase/firebaseConfig";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const miContexto = createContext(undefined);
 
@@ -10,6 +12,23 @@ export const AppContext = ({ children }) => {
   const [rutasData, setRutasData] = useState(null);
   const [usuarioRuta, setUsuarioRuta] = useState(null);
   const [infoClientes, setInfoClientes] = useState(null);
+  const [isLogouting, setIsLogouting] = useState(false);
+  // cerrar sesion
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    setIsLogouting(true);
+    try {
+      await auth.signOut();
+      toast.success("Sesión cerrada exitosamente.");
+      navigate("/");
+      setIsLogouting(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   // Obtebner datos de usuarios administradores
 
@@ -151,8 +170,12 @@ export const AppContext = ({ children }) => {
         usersAdminData,
         rutasData,
         usuarioRuta,
+        setUsuarioRuta,
         infoClientes,
         setInfoClientes,
+        setRutasData,
+        handleLogout,
+        isLogouting,
       }}
     >
       {children}

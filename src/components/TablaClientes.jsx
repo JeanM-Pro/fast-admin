@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AbonoModal } from "./AbonoModal";
 import { DetallesClienteModal } from "./DetallesClienteModal";
 
-export const TablaClientes = ({ datos, usuarioRuta }) => {
+export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
   const [isAbono, setIsAbono] = useState(false);
   const [selectedAbono, setSelectedAbono] = useState(null);
   const [verDetallesCliente, setVerDetallesCliente] = useState(false);
@@ -43,6 +43,7 @@ export const TablaClientes = ({ datos, usuarioRuta }) => {
           setIsAbono={setIsAbono}
           selectedAbono={selectedAbono}
           usuarioRuta={usuarioRuta}
+          setUsuarioRuta={setUsuarioRuta}
           setSelectedAbono={(updatedAbono) => {
             setSelectedAbono(updatedAbono);
             // Actualiza localmente los datos en la tabla

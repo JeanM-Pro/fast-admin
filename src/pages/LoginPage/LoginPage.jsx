@@ -31,6 +31,7 @@ export const LoginPage = ({ setUser }) => {
       navigate("/home");
 
       toast.success("Inicio de sesión exitoso");
+      window.location.reload();
     } catch (error) {
       toast.error("El email o la contraseña son incorrectos.");
       console.error("Error de inicio de sesión:", error.message);

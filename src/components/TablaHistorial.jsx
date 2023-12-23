@@ -30,7 +30,7 @@ export const TablaHistorial = ({ datos }) => {
       <h2 className="text-lg text-center font-semibold">Historial de Pagos</h2>
       <table className="min-w-full mt-4 bg-white">
         <thead>
-          <tr className="bg-red-100 ">
+          <tr className="bg-[#8131bd] text-white ">
             <th className="border border-black w-[8%] px-2 py-1">#</th>
             <th className="border border-black w-[46%] px-2 py-1">Cantidad</th>
             <th className="border border-black w-[46%] px-2 py-1">fecha</th>

@@ -7,6 +7,7 @@ export const AbonoModal = ({
   setIsAbono,
   selectedAbono,
   usuarioRuta,
+  setUsuarioRuta,
   setSelectedAbono,
 }) => {
   const [isSubmiting, setIsSubmiting] = useState(false);
@@ -47,6 +48,31 @@ export const AbonoModal = ({
         0,
         selectedAbono.cuotasAtrasadas - vecesSuperado
       );
+
+      // Restar prestamo al saldo disponible en firebase
+
+      const rutaRef = doc(
+        db,
+        "admin_users",
+        usuarioRuta.adminUid,
+        "rutas",
+        usuarioRuta.uid
+      );
+
+      const rutaSnapshot = await getDoc(rutaRef);
+      const rutaData = rutaSnapshot.data();
+
+      const saldoViejoNum = parseInt(usuarioRuta.saldoInicial);
+      const saldoNuevo = saldoViejoNum + abono;
+
+      await updateDoc(rutaRef, {
+        ...rutaData,
+        saldoInicial: saldoNuevo,
+      });
+
+      // Restar prestamo al saldo disponible localmente
+
+      setUsuarioRuta({ ...usuarioRuta, saldoInicial: saldoNuevo });
 
       const nuevoHistorial = {
         abono: abono,

@@ -1,20 +1,18 @@
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import logoNav from "../images/logonav.png";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import logoLetra from "../images/logoLetra.png";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { ImUsers } from "react-icons/im";
 import { AiFillHome } from "react-icons/ai";
 import { MoonLoader } from "react-spinners";
-import { toast } from "react-toastify";
-import { auth } from "../firebase/firebaseConfig";
 import { BiSolidLogOut } from "react-icons/bi";
+import { miContexto } from "../context/AppContext";
+import { FaMoneyCheckDollar } from "react-icons/fa6";
 
 export const Navbar = () => {
   const [toggleNavbar, setToggleNavbar] = useState(false);
   const [animationNavbar, setAnimationNavbar] = useState(false);
-  const [isLogouting, setIsLogouting] = useState(false);
-  const navigate = useNavigate;
+  const { handleLogout, isLogouting } = useContext(miContexto);
 
   const handleToggleNavbar = () => {
     setAnimationNavbar(!animationNavbar);
@@ -28,19 +26,6 @@ export const Navbar = () => {
   };
   const location = useLocation();
   const ruta = location.pathname;
-
-  const handleLogout = async () => {
-    setIsLogouting(true);
-    try {
-      await auth.signOut();
-      toast.success("Sesión cerrada exitosamente.");
-      navigate("/login");
-      setIsLogouting(false);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
-  };
 
   return (
     <>
@@ -96,7 +81,7 @@ export const Navbar = () => {
       </div>
       {toggleNavbar ? (
         <div
-          className={`w-[95%] flex flex-col pt-4 px-7 h-[600px] bg-white mt-[60px] fixed animate__animated ${
+          className={`z-30 w-[95%] flex flex-col pt-4 px-7 h-[600px] bg-white mt-[60px] fixed animate__animated ${
             animationNavbar ? "animate__fadeInLeft" : "animate__fadeOutLeft"
           } `}
         >
@@ -113,13 +98,13 @@ export const Navbar = () => {
               </NavLink>
 
               <NavLink
-                to="/trabajadores"
+                to="/gastos-diarios"
                 className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
-                  ruta === "/trabajadores" ? "bg-[#8131bd] text-white" : ""
+                  ruta === "/gastos-diarios" ? "bg-[#8131bd] text-white" : ""
                 }`}
               >
-                <ImUsers className="mr-2" size={25} />
-                Trabajadores
+                <FaMoneyCheckDollar className="mr-2" size={25} />
+                Gastos diarios
               </NavLink>
 
               <button
