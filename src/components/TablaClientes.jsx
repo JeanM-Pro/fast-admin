@@ -1,7 +1,8 @@
-import { useState } from "react";
-// import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
+import { useContext, useState } from "react";
 import { AbonoModal } from "./AbonoModal";
 import { DetallesClienteModal } from "./DetallesClienteModal";
+import { miContexto } from "../context/AppContext";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 
 export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
   const [isAbono, setIsAbono] = useState(false);
@@ -9,22 +10,24 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
   const [verDetallesCliente, setVerDetallesCliente] = useState(false);
   const [selectedDetallesCliente, setSelectedDetallesCliente] = useState(null);
   const [clientes, setClientes] = useState(datos);
+  const { userData } = useContext(miContexto);
+  console.log(userData);
 
-  // const handleEditClick = (admin) => {
-  //   if (!usuarioRuta.isAdmin) {
-  //     return;
-  //   } else {
-  //     console.log("editar", admin);
-  //   }
-  // };
+  const handleEditClick = (admin) => {
+    if (!usuarioRuta.isAdmin) {
+      return;
+    } else {
+      console.log("editar", admin);
+    }
+  };
 
-  // const handleDeleteClick = (admin) => {
-  //   if (!usuarioRuta.isAdmin) {
-  //     return;
-  //   } else {
-  //     console.log("eliminar", admin);
-  //   }
-  // };
+  const handleDeleteClick = (admin) => {
+    if (!usuarioRuta.isAdmin) {
+      return;
+    } else {
+      console.log("eliminar", admin);
+    }
+  };
 
   const handleAbono = (cliente) => {
     setSelectedAbono(cliente);
@@ -73,6 +76,13 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
             <th className="border border-black w-fit px-2 py-1">cuota</th>
             <th className="border border-black w-fit px-2 py-1">c.pag</th>
             <th className="border border-black w-fit px-2 py-1">c.res</th>
+            {userData?.isAdmin && (
+              <>
+                <th className="border border-black w-10 px-2 py-1">Editar</th>
+                <th className="border border-black w-10 px-2 py-1">Eliminar</th>
+              </>
+            )}
+
             <th className="border border-black w-fit px-2 py-1">detalles</th>
           </tr>
         </thead>
@@ -111,6 +121,24 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
                 <td className="border border-black px-2 w-fit text-center py-2">
                   {item.cuotasPactadas - item.cuotasPagadas}
                 </td>
+
+                {userData?.isAdmin && (
+                  <>
+                    <td className="border border-black w-10 text-center px-2 py-1 font-semibold">
+                      <AiOutlineEdit
+                        onClick={() => handleEditClick(item)}
+                        className="cursor-pointer my-0 mx-auto"
+                      />
+                    </td>
+
+                    <td className="border border-black w-10  px-2 py-1 font-semibold">
+                      <AiOutlineDelete
+                        className="cursor-pointer my-0 mx-auto"
+                        onClick={() => handleDeleteClick(item)}
+                      />
+                    </td>
+                  </>
+                )}
 
                 <td
                   onClick={() => handleDetallesCliente(item)}

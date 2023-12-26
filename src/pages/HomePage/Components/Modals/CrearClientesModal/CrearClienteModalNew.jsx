@@ -229,11 +229,32 @@ export const CrearClienteModalNew = ({
       await updateDoc(rutaRef, {
         ...rutaData,
         saldoInicial: saldoNuevo,
+        movimientos: [
+          {
+            monto: datosCliente.valorPrestamo,
+            fecha: new Date(),
+            responsable: rutaData.responsable,
+            descripcion: "prestamo",
+          },
+          ...rutaData.movimientos,
+        ],
       });
 
       // Restar prestamo al saldo disponible localmente
 
-      setUsuarioRuta({ ...usuarioRuta, saldoInicial: saldoNuevo });
+      setUsuarioRuta({
+        ...usuarioRuta,
+        saldoInicial: saldoNuevo,
+        movimientos: [
+          {
+            monto: datosCliente.valorPrestamo,
+            fecha: new Date(),
+            responsable: rutaData.responsable,
+            descripcion: "prestamo",
+          },
+          ...usuarioRuta.movimientos,
+        ],
+      });
 
       // Ahora puedes utilizar 'imageUrl' para almacenar la URL de la imagen en la base de datos o donde sea necesario
       const valorPrestamoNum = parseInt(datosCliente.valorPrestamo);

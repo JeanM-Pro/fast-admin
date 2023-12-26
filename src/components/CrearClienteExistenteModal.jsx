@@ -9,7 +9,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { miContexto } from "../context/AppContext";
-import { formatDistance } from "date-fns";
+import { format } from "date-fns";
 import { guardarClienteEnFirebase } from "../pages/HomePage/Components/firebaseFunctions";
 import { toast } from "react-toastify";
 import { AiOutlineUser } from "react-icons/ai";
@@ -38,7 +38,7 @@ export const CrearClienteExistenteModal = ({
   const [datosCliente, setDatosCliente] = useState({
     image: selectedCliente?.imageUrl,
     imageTienda: selectedCliente?.imageTienda,
-    cpf: "",
+    cpf: selectedCliente?.cpf,
     nombreCliente: selectedCliente?.nombreCliente,
     direccionCobro: selectedCliente?.direccionCobro,
     telefono: selectedCliente?.telefono,
@@ -93,10 +93,20 @@ export const CrearClienteExistenteModal = ({
     fetchData();
   }, [usuarioRuta]);
 
-  console.log(selectedCliente);
-
   const handleSelectedCliente = (cliente) => {
     setSelectedCliente(cliente);
+    setDatosCliente((prevDatosCliente) => ({
+      ...prevDatosCliente,
+      cpf: cliente.cpf || "",
+      image: cliente.imageUrl || "",
+      imageTienda: cliente.imageTienda || "",
+      nombreCliente: cliente.nombreCliente || "",
+      direccionCobro: cliente.direccionCobro || "",
+      telefono: cliente.telefono || "",
+      direccion: cliente.direccion || "",
+      descripcion: cliente.descripcion || "",
+      ubicacion: cliente.ubicacion || "",
+    }));
     setShowInputSearch(false);
     setSearchTerm("");
   };
@@ -159,8 +169,7 @@ export const CrearClienteExistenteModal = ({
       }
 
       // Formatear la fecha
-      const fechaFinalFormateada = formatDistance(fechaFinal, "dd/MM/yyyy");
-
+      const fechaFinalFormateada = format(fechaFinal, "dd/MM/yyyy");
       return {
         ...prevDatosCliente,
         cuotasPactadas: cuotasPactadasNum,
@@ -260,11 +269,32 @@ export const CrearClienteExistenteModal = ({
       await updateDoc(rutaRef, {
         ...rutaData,
         saldoInicial: saldoNuevo,
+        movimientos: [
+          {
+            monto: datosCliente.valorPrestamo,
+            fecha: new Date(),
+            responsable: rutaData.responsable,
+            descripcion: "prestamo",
+          },
+          ...rutaData.movimientos,
+        ],
       });
 
       // Restar prestamo al saldo disponible localmente
 
-      setUsuarioRuta({ ...usuarioRuta, saldoInicial: saldoNuevo });
+      setUsuarioRuta({
+        ...usuarioRuta,
+        saldoInicial: saldoNuevo,
+        movimientos: [
+          {
+            monto: datosCliente.valorPrestamo,
+            fecha: new Date(),
+            responsable: rutaData.responsable,
+            descripcion: "prestamo",
+          },
+          ...usuarioRuta.movimientos,
+        ],
+      });
 
       const valorPrestamoNum = parseInt(datosCliente.valorPrestamo);
       const porcentajeInteresNum = parseInt(datosCliente.porcentajeInteres);
@@ -329,7 +359,7 @@ export const CrearClienteExistenteModal = ({
     {
       icono: <HiOutlineIdentification size={24} />,
       placeholder: "CPF",
-      valor: datosCliente?.cpf || "",
+      valor: datosCliente.cpf,
       onChange: (e) =>
         setDatosCliente({ ...datosCliente, cpf: e.target.value }),
     },
@@ -441,6 +471,7 @@ export const CrearClienteExistenteModal = ({
                     accept="image/*"
                     className="hidden"
                     onChange={handleImageChange}
+                    disabled={true}
                   />
                   <HiOutlinePhotograph size={24} />
                 </label>
@@ -475,6 +506,7 @@ export const CrearClienteExistenteModal = ({
                     accept="image/*"
                     className="hidden"
                     onChange={handleImageTiendaChange}
+                    disabled={true}
                   />
                   <HiOutlinePhotograph size={24} />
                 </label>

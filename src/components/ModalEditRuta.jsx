@@ -26,10 +26,34 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
     const rutaSnapshot = await getDoc(rutaRef);
     const rutaData = rutaSnapshot.data();
 
+    let nuevoMonto;
+    let motivo;
+
+    if (rutaData.saldoInicial > saldoInicial) {
+      nuevoMonto = rutaData.saldoInicial - saldoInicial;
+      motivo = "Retiro";
+    } else {
+      nuevoMonto = saldoInicial - rutaData.saldoInicial;
+      motivo = "Ingreso";
+    }
+
     await updateDoc(rutaRef, {
       ...rutaData,
       responsable: responsable,
       saldoInicial: saldoInicial,
+      movimientos: [
+        {
+          monto: nuevoMonto,
+          fecha: new Date(),
+          responsable: "Admin",
+          descripcion: motivo,
+        },
+        ...rutaData.movimientos,
+      ],
+      historialSaldos: [
+        { fecha: new Date(), saldo: saldoInicial },
+        ...rutaData.historialSaldos,
+      ],
     });
 
     const updatedRutasData = rutasData.map((ruta) =>

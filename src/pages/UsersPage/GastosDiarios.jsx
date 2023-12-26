@@ -64,7 +64,7 @@ export const GastosDiarios = () => {
   return (
     <>
       <Navbar />
-      <div className="w-full h-full bg-gray-200 pt-16 px-4 md:px-8 pb-4">
+      <div className="w-full min-h-screen h-full bg-gray-200 pt-16 px-4 md:px-8 pb-4">
         <div className="w-full flex-col gap-2 flex justify-center items-center">
           <h2 className="font-bold text-lg">Agregar Gasto</h2>
           <div className="bg-white border shadow-[2px_2px_8px_rgb(0,0,0,0.5)] border-gray-400 w-full md:w-[400px] p-4 rounded-md max-h-[90%]">

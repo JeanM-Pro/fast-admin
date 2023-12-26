@@ -50,6 +50,11 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
       // Obtener el UID del nuevo usuario
       const uid = newUser?.uid;
 
+      const saldoInicialHistorial = {
+        saldo: saldoInicial,
+        fecha: new Date(),
+      };
+
       if (uid) {
         // Guardar información en Firestore
         const db = getFirestore();
@@ -63,6 +68,8 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
           responsable: responsable,
           saldoInicial: saldoInicial,
           historialGastos: [],
+          movimientos: [],
+          historialSaldos: [saldoInicialHistorial],
         });
 
         setRutasData([
@@ -75,6 +82,8 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
             responsable: responsable,
             saldoInicial: saldoInicial,
             historialGastos: [],
+            movimientos: [],
+            historialSaldos: [saldoInicialHistorial],
           },
         ]);
 

@@ -5,6 +5,7 @@ import { RegisterPage } from "../pages/RegisterPage/RegisterPage";
 import { HomePage } from "../pages/HomePage/HomePage";
 import { auth } from "../firebase/firebaseConfig";
 import { GastosDiarios } from "../pages/UsersPage/GastosDiarios";
+import { EstadisticasPage } from "../pages/Estadisticas/EstadisticasPage";
 
 export const AppRouter = () => {
   const [user, setUser] = useState(null);
@@ -34,6 +35,7 @@ export const AppRouter = () => {
           <Route path="/home" element={<HomePage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/gastos-diarios" element={<GastosDiarios />} />
+          <Route path="/estadisticas" element={<EstadisticasPage />} />
         </Routes>
       ) : (
         <Routes>

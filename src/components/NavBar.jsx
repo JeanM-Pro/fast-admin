@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import logoNav from "../images/logonav.png";
 import { useContext, useState } from "react";
 import logoLetra from "../images/logoLetra.png";
@@ -8,11 +8,13 @@ import { MoonLoader } from "react-spinners";
 import { BiSolidLogOut } from "react-icons/bi";
 import { miContexto } from "../context/AppContext";
 import { FaMoneyCheckDollar } from "react-icons/fa6";
+import { FcStatistics } from "react-icons/fc";
 
 export const Navbar = () => {
   const [toggleNavbar, setToggleNavbar] = useState(false);
   const [animationNavbar, setAnimationNavbar] = useState(false);
   const { handleLogout, isLogouting } = useContext(miContexto);
+  const navigate = useNavigate();
 
   const handleToggleNavbar = () => {
     setAnimationNavbar(!animationNavbar);
@@ -30,7 +32,12 @@ export const Navbar = () => {
   return (
     <>
       <div className="fixed w-full lg:px-16 px-6 flex justify-between items-center lg:py-0 py-2 bg-white shadow-[2px_0px_6px_rgb(0,0,0,0.5)]">
-        <img src={logoNav} alt="logo" className="w-[40px] h-[40px]" />
+        <img
+          src={logoNav}
+          alt="logo"
+          className="w-[40px] h-[40px] cursor-pointer"
+          onClick={() => navigate("/home")}
+        />
 
         <img src={logoLetra} alt="logo" className="w-[180px] lg:hidden" />
 
@@ -46,34 +53,41 @@ export const Navbar = () => {
               <li>
                 <NavLink
                   className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
-                  to={"/usuarios"}
+                  to={"/home"}
                 >
-                  Features
+                  Inicio
                 </NavLink>
               </li>
               <li>
                 <NavLink
                   className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
-                  to={"/usuarios"}
+                  to={"/gastos-diarios"}
                 >
-                  Pricing
+                  Gastos Diarios
                 </NavLink>
               </li>
               <li>
                 <NavLink
                   className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
-                  to={"/usuarios"}
+                  to={"/estadisticas"}
                 >
-                  Documentation
+                  Estadisticas
                 </NavLink>
               </li>
               <li>
-                <NavLink
-                  className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400 lg:mb-0 mb-2"
-                  to={"/usuarios"}
+                <button
+                  type="button"
+                  className="bg-[#8131bd] w-fit px-2 font-semibold text-white py-1 rounded-3xl flex justify-center items-center min-w-[80px]"
+                  onClick={handleLogout}
+                  disabled={isLogouting}
                 >
-                  Support
-                </NavLink>
+                  <BiSolidLogOut className="mr-2" size={16} />
+                  {isLogouting ? (
+                    <MoonLoader size={20} color="#ffffff" />
+                  ) : (
+                    "Salir"
+                  )}
+                </button>
               </li>
             </ul>
           </nav>
@@ -105,6 +119,19 @@ export const Navbar = () => {
               >
                 <FaMoneyCheckDollar className="mr-2" size={25} />
                 Gastos diarios
+              </NavLink>
+
+              <NavLink
+                to="/estadisticas"
+                className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
+                  ruta === "/estadisticas" ? "bg-[#8131bd] text-white" : ""
+                }`}
+              >
+                <FcStatistics
+                  className="mr-2 filter grayscale saturate-200"
+                  size={25}
+                />
+                Estadisticas
               </NavLink>
 
               <button

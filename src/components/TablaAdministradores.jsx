@@ -2,11 +2,13 @@ import { useState } from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { ModalDeleteRuta } from "./ModalDeleteRuta";
 import { ModalEditRuta } from "./ModalEditRuta";
+import { VerDetallesRutasModal } from "./VerDetallesRutasModal";
 
 export const TablaAdministradores = ({ datos }) => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
+  const [verDetalles, setVerDetalles] = useState(false);
 
   const handleEditClick = (ruta) => {
     setSelectedRuta(ruta);
@@ -18,8 +20,21 @@ export const TablaAdministradores = ({ datos }) => {
     setShowModalDelete(true);
   };
 
+  const handleVerDetallesClick = (ruta) => {
+    setSelectedRuta(ruta);
+    setVerDetalles(true);
+  };
+
   return (
     <>
+      {verDetalles ? (
+        <VerDetallesRutasModal
+          setVerDetalles={setVerDetalles}
+          selectedRuta={selectedRuta}
+          setSelectedRuta={setSelectedRuta}
+        />
+      ) : null}
+
       {showModalDelete ? (
         <ModalDeleteRuta
           setShowModalDelete={setShowModalDelete}
@@ -84,7 +99,10 @@ export const TablaAdministradores = ({ datos }) => {
                   />
                 </td>
 
-                <td className="border cursor-pointer underline border-black px-2 whitespace-nowrap text-center py-1 font-semibold">
+                <td
+                  onClick={() => handleVerDetallesClick(item)}
+                  className="border cursor-pointer underline border-black px-2 whitespace-nowrap text-center py-1 font-semibold"
+                >
                   Ver
                 </td>
               </tr>
