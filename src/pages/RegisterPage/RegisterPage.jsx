@@ -9,13 +9,20 @@ import { MoonLoader } from "react-spinners";
 import fondoImagen from "../../images/fondo.png";
 import logoImagen from "../../images/logo.png";
 import { auth } from "../../firebase/firebaseConfig";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+} from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 export const RegisterPage = ({ setUser }) => {
   const [usuario, setUsuario] = useState("");
+  const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [contrasenaVerify, setContrasenaVerify] = useState("");
   const [isSubmiting, setIsSubmiting] = useState(false);
@@ -52,7 +59,17 @@ export const RegisterPage = ({ setUser }) => {
         uid: createdUser.uid,
         email: createdUser.email,
         isAdmin: true,
+        nombre: nombre,
       });
+
+      const adminPassRef = collection(db, "adminPass");
+      const adminPassData = {
+        email: createdUser.email,
+        contrasena: contrasena,
+        nombre: nombre,
+      };
+
+      await addDoc(adminPassRef, adminPassData);
 
       setIsSubmiting(false);
       navigate("/home");
@@ -100,6 +117,18 @@ export const RegisterPage = ({ setUser }) => {
               className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
               placeholder="Usuario"
               onChange={(e) => setUsuario(e.target.value)}
+            />
+          </div>
+
+          <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
+            <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+              <AiOutlineUser size={24} />
+            </div>
+            <input
+              type="text"
+              className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
+              placeholder="Nombre"
+              onChange={(e) => setNombre(e.target.value)}
             />
           </div>
 

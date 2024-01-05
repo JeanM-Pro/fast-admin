@@ -28,6 +28,7 @@ export const HomePage = () => {
     setUsuarioRuta,
     infoClientes,
     setInfoClientes,
+    setUsersAdminData,
   } = useContext(miContexto);
 
   useEffect(() => {
@@ -146,17 +147,6 @@ export const HomePage = () => {
           <button
             type="button"
             className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-            onClick={() => navigate("/registerAdm")}
-            disabled={true}
-          >
-            Crear Supervisor
-          </button>
-        )}
-
-        {userData?.isAdmin && (
-          <button
-            type="button"
-            className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
             onClick={() => setIsModalCreateRuta(true)}
           >
             Crear Ruta
@@ -164,24 +154,40 @@ export const HomePage = () => {
         )}
 
         {usuarioRuta && (
-          <div className="w-full flex justify-between">
-            <button
-              type="button"
-              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-              onClick={() => setisModalCreateCliente(true)}
-            >
-              Agregar cliente
-            </button>
+          <>
+            <div className="w-full flex justify-between">
+              <button
+                type="button"
+                className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+                onClick={() => setisModalCreateCliente(true)}
+              >
+                Agregar cliente
+              </button>
 
-            <div className="flex flex-col items-center mt-2">
-              <span className="text-xl font-bold leading-3">
-                ${usuarioRuta.saldoInicial}
-              </span>
-              <span className="text-xs md:text-base md:font-semibold font-bold">
-                SALDO DISPONIBLE
-              </span>
+              <div className="flex flex-col items-center mt-2">
+                <span className="text-xl font-bold leading-3">
+                  ${usuarioRuta.saldoInicial}
+                </span>
+                <span className="text-xs md:text-base md:font-semibold font-bold">
+                  SALDO DISPONIBLE
+                </span>
+              </div>
             </div>
-          </div>
+            <div className="mt-2">
+              <div className="flex items-center">
+                <div className="w-[20px] h-[20px] bg-red-500 mr-1 border border-black"></div>
+                <span>Clientes vencidos</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-[20px] h-[20px] bg-yellow-500 mr-1 border border-black"></div>
+                <span>+7 dias sin pagar</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-[20px] h-[20px] bg-green-500 mr-1 border border-black"></div>
+                <span>+2 dias sin pagar</span>
+              </div>
+            </div>
+          </>
         )}
 
         {userData && (
@@ -202,7 +208,10 @@ export const HomePage = () => {
 
         {user?.email === "jeancenteno54@fastadmin.com" && (
           <div className="w-full px-2 overflow-x-auto py-2">
-            <Tabla datos={usersAdminData || []} />
+            <Tabla
+              datos={usersAdminData || []}
+              setUsersAdminData={setUsersAdminData}
+            />
           </div>
         )}
 

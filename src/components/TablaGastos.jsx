@@ -1,27 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
+import { miContexto } from "../context/AppContext";
 
 export const TablaGastos = ({ datos }) => {
-  function formatDate(fecha) {
-    let fechaJavaScript;
-
-    // Verificar si la fecha ya es una instancia de Date
-    if (fecha instanceof Date) {
-      fechaJavaScript = fecha;
-    } else {
-      // Si no es una instancia de Date, intentar parsear la cadena
-      fechaJavaScript = new Date(
-        fecha.seconds * 1000 + fecha.nanoseconds / 1e6
-      );
-    }
-
-    const dia = fechaJavaScript.getDate();
-    const mes = fechaJavaScript.getMonth() + 1;
-    const ano = fechaJavaScript.getFullYear();
-    const hora = fechaJavaScript.getHours();
-    const minutos = fechaJavaScript.getMinutes();
-
-    return `${dia}/${mes}/${ano}  ${hora}:${minutos}`;
-  }
+  const { formatDate } = useContext(miContexto);
 
   return (
     <>

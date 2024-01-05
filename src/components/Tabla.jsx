@@ -1,16 +1,43 @@
+import { useState } from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
+import { ModalEditAdmin } from "./modalsCreadot/ModalEditAdmin";
+import { ModalDeleteAdmin } from "./modalsCreadot/ModalDeleteAdmin";
 
-export const Tabla = ({ datos }) => {
+export const Tabla = ({ datos, setUsersAdminData }) => {
+  const [modalEdit, setModalEdit] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+
   const handleEditClick = (admin) => {
-    console.log("editar", admin);
+    setSelectedAdmin(admin);
+    setModalEdit(true);
   };
 
   const handleDeleteClick = (admin) => {
-    console.log("eliminar", admin);
+    setSelectedAdmin(admin);
+    setModalDelete(true);
   };
 
   return (
     <>
+      {modalEdit ? (
+        <ModalEditAdmin
+          setModalEdit={setModalEdit}
+          selectedAdmin={selectedAdmin}
+          datos={datos}
+          setUsersAdminData={setUsersAdminData}
+        />
+      ) : null}
+
+      {modalDelete ? (
+        <ModalDeleteAdmin
+          setModalDelete={setModalDelete}
+          selectedAdmin={selectedAdmin}
+          datos={datos}
+          setUsersAdminData={setUsersAdminData}
+        />
+      ) : null}
+
       <table className="min-w-full mt-8 bg-white">
         <thead>
           <tr className="bg-[#8131bd] text-white">

@@ -8,7 +8,7 @@ export const TablaMovimientosModal = ({
   setMostrarMovimientos,
 }) => {
   return (
-    <div className="w-full min-h-screen h-screen z-10 bg-black bg-opacity-50 px-2 md:px-8 flex justify-center items-center fixed ">
+    <div className="w-full min-h-screen h-screen z-40 bg-black bg-opacity-50 px-2 md:px-8 flex justify-center items-center fixed top-0 left-0">
       <div className="bg-gray-200 w-[400px] md:w-full py-4 px-1 rounded-md relative max-h-[90%] overflow-y-auto">
         <IoIosClose
           className="absolute right-0 top-0 cursor-pointer"

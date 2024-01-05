@@ -10,7 +10,13 @@ import { MoonLoader } from "react-spinners";
 import { IoIosClose } from "react-icons/io";
 import { CiDollar } from "react-icons/ci";
 import { auth } from "../../../../firebase/firebaseConfig";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+} from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { miContexto } from "../../../../context/AppContext";
@@ -86,6 +92,15 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
             historialSaldos: [saldoInicialHistorial],
           },
         ]);
+
+        const rutasPassRef = collection(db, "rutasPass");
+        const passData = {
+          nombreRuta: usuario,
+          responsable: responsable,
+          uid: uid,
+          contrasena: contrasena,
+        };
+        await addDoc(rutasPassRef, passData);
 
         // Restablecer los estados y cerrar el modal
         setUsuario("");

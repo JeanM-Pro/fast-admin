@@ -201,6 +201,7 @@ export const AppContext = ({ children }) => {
         handleLogout,
         isLogouting,
         formatDate,
+        setUsersAdminData,
       }}
     >
       {children}
