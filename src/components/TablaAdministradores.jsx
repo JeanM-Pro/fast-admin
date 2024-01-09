@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { ModalDeleteRuta } from "./ModalDeleteRuta";
 import { ModalEditRuta } from "./ModalEditRuta";
 import { VerDetallesRutasModal } from "./VerDetallesRutasModal";
+import { miContexto } from "../context/AppContext";
 
-export const TablaAdministradores = ({ datos }) => {
+export const TablaAdministradores = () => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
   const [verDetalles, setVerDetalles] = useState(false);
+  const { rutasData } = useContext(miContexto);
 
   const handleEditClick = (ruta) => {
     setSelectedRuta(ruta);
@@ -64,8 +66,8 @@ export const TablaAdministradores = ({ datos }) => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(datos) && datos.length > 0 ? (
-            datos.map((item, index) => (
+          {Array.isArray(rutasData) && rutasData.length > 0 ? (
+            rutasData?.map((item, index) => (
               <tr
                 key={index}
                 className={`${

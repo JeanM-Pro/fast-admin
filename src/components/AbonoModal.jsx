@@ -68,11 +68,32 @@ export const AbonoModal = ({
       await updateDoc(rutaRef, {
         ...rutaData,
         saldoInicial: saldoNuevo,
+        movimientos: [
+          {
+            monto: abono,
+            fecha: new Date(),
+            responsable: clienteData.nombreCliente,
+            descripcion: "Abono Cliente",
+          },
+          ...rutaData.movimientos,
+        ],
       });
 
       // Restar prestamo al saldo disponible localmente
 
-      setUsuarioRuta({ ...usuarioRuta, saldoInicial: saldoNuevo });
+      setUsuarioRuta({
+        ...usuarioRuta,
+        saldoInicial: saldoNuevo,
+        movimientos: [
+          {
+            monto: abono,
+            fecha: new Date(),
+            responsable: clienteData.nombreCliente,
+            descripcion: "Abono Cliente",
+          },
+          ...usuarioRuta.movimientos,
+        ],
+      });
 
       const nuevoHistorial = {
         abono: abono,

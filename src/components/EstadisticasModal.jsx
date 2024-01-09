@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { miContexto } from "../context/AppContext";
 import { TablaMovimientosModal } from "../pages/Estadisticas/components/TablaMovimientosModal";
+import { format } from "date-fns";
 
 export const EstadisticasModal = ({
   setVerEstadisticas,
@@ -29,6 +30,49 @@ export const EstadisticasModal = ({
 
   const ganancias =
     parseInt(selectedRuta?.saldoInicial) - parseInt(saldoMasNuevo);
+
+  const calcularTotalAbonos = () => {
+    // infoClientes es el array de clientes que contiene la propiedad 'abono'
+    if (!clientes || clientes?.length === 0) {
+      return 0; // Si no hay clientes, el total de abonos es cero
+    }
+
+    // Sumar los abonos de todos los clientes
+    const totalAbonos = clientes?.reduce(
+      (acumulador, cliente) => acumulador + (cliente.abono || 0),
+      0
+    );
+
+    return totalAbonos;
+  };
+
+  // Obtener el total de abonos llamando a la función
+  const totalAbonos = calcularTotalAbonos();
+
+  const fechaHoy = format(new Date(), "dd/MM/yyyy");
+
+  const calcularPrestamoDelDia = () => {
+    // infoClientes es el array de clientes que contiene la propiedad 'valorPrestamo'
+    if (!clientes || clientes?.length === 0) {
+      return 0; // Si no hay clientes, el total de préstamos es cero
+    }
+
+    // Filtrar los clientes cuya fecha sea igual a la fecha de hoy
+    const clientesDelDia = clientes?.filter(
+      (cliente) => cliente.fechaActual === fechaHoy
+    );
+
+    // Sumar los valores de 'valorPrestamo' de los clientes del día
+    const prestamoDelDia = clientesDelDia?.reduce(
+      (acumulador, cliente) => acumulador + (cliente.valorPrestamo || 0),
+      0
+    );
+
+    return prestamoDelDia;
+  };
+
+  // Obtener el total de préstamos del día llamando a la función
+  const prestamoDelDia = calcularPrestamoDelDia();
 
   return (
     <>
@@ -71,6 +115,15 @@ export const EstadisticasModal = ({
             <p>
               Total Clientes:{" "}
               <span className="font-bold">{clientes.length}</span>
+            </p>
+
+            <p>
+              Cobro del dia: <span className="font-bold">${totalAbonos}</span>
+            </p>
+
+            <p>
+              Prestamos del dia:{" "}
+              <span className="font-bold">${prestamoDelDia}</span>
             </p>
           </div>
           <button

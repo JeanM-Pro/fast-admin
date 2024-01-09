@@ -131,6 +131,8 @@ export const AppContext = ({ children }) => {
     fetchData();
   }, [usersAdminData]);
 
+  // OBTENER CLIENTES
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -151,7 +153,16 @@ export const AppContext = ({ children }) => {
             const clienteData = doc.data();
             return { uid, ...clienteData };
           });
-          setInfoClientes(data);
+          setInfoClientes(
+            data.sort((a, b) => {
+              const posicionA =
+                a.posicion !== undefined ? a.posicion : data.length - 1;
+              const posicionB =
+                b.posicion !== undefined ? b.posicion : data.length - 1;
+
+              return posicionA - posicionB;
+            })
+          );
         }
       } catch (error) {
         console.error("Error fetching data from Firebase:", error);

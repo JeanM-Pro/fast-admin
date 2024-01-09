@@ -16,7 +16,12 @@ import { MoonLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { parse } from "date-fns";
 
-export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
+export const TablaClientes = ({
+  datos,
+  usuarioRuta,
+  setUsuarioRuta,
+  isEditIndex,
+}) => {
   const [isAbono, setIsAbono] = useState(false);
   const [selectedAbono, setSelectedAbono] = useState(null);
   const [verDetallesCliente, setVerDetallesCliente] = useState(false);
@@ -27,6 +32,88 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
   const [clientes, setClientes] = useState(datos);
   const { userData, rutasData } = useContext(miContexto);
   const [isMovingClient, setIsMovingClient] = useState(false);
+  const [orderValues, setOrderValues] = useState({});
+  const initialInputValues = {};
+  const [inputValues, setInputValues] = useState(initialInputValues);
+
+  const handleChangeOrder = (clienteUid, newOrder) => {
+    // Actualiza el estado de orderValues y el valor del input
+    setOrderValues((prevOrderValues) => ({
+      ...prevOrderValues,
+      [clienteUid]: newOrder,
+    }));
+    setInputValues((prevInputValues) => ({
+      ...prevInputValues,
+      [clienteUid]: newOrder + 1,
+    }));
+  };
+
+  const handleButtonClick = async () => {
+    try {
+      // Actualiza la posición de los clientes en Firebase
+      const db = getFirestore();
+      const rutaRef = doc(
+        db,
+        "admin_users",
+        usuarioRuta.adminUid,
+        "rutas",
+        usuarioRuta.uid
+      );
+
+      // Almacena todas las promesas de actualización en un array
+      const updatePromises = Object.keys(orderValues).map(
+        async (clienteUid) => {
+          const newOrder = orderValues[clienteUid];
+          const clienteRef = doc(rutaRef, "clientes", clienteUid);
+
+          // Actualiza la posición del cliente en Firebase
+          await setDoc(clienteRef, { posicion: newOrder + 1 }, { merge: true });
+        }
+      );
+
+      // Espera a que todas las promesas de actualización se completen
+      await Promise.all(updatePromises);
+
+      // Actualiza el orden de los clientes basado en orderValues
+      const newClientes = [...clientes];
+
+      Object.keys(orderValues).forEach((clienteUid) => {
+        const newOrder = orderValues[clienteUid];
+        const clienteIndex = newClientes.findIndex(
+          (client) => client.uid === clienteUid
+        );
+
+        if (clienteIndex !== -1) {
+          // Actualiza localmente el valor de posicion del cliente
+          newClientes[clienteIndex] = {
+            ...newClientes[clienteIndex],
+            posicion: newOrder + 1,
+          };
+        }
+
+        if (clienteIndex !== -1) {
+          newClientes.splice(
+            newOrder,
+            0,
+            newClientes.splice(clienteIndex, 1)[0]
+          );
+        }
+      });
+
+      // Actualiza el estado de clientes con el nuevo orden
+      setClientes(newClientes);
+
+      // Limpia los valores de los inputs y orderValues
+      setInputValues({});
+      setOrderValues({});
+      window.location.reload();
+    } catch (error) {
+      console.error(
+        "Error al actualizar la posición del cliente:",
+        error.message
+      );
+    }
+  };
 
   const rutasFiltradas = rutasData?.filter(
     (ruta) => ruta.uid !== usuarioRuta.uid
@@ -140,6 +227,7 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
           setSelectedCliente={setSelectedCliente}
           userData={userData}
           usuarioRuta={usuarioRuta}
+          setUsuarioRuta={setUsuarioRuta}
           setClientes={setClientes}
         />
       ) : null}
@@ -180,6 +268,12 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
       <table className="min-w-full mt-2 bg-white">
         <thead>
           <tr className="bg-[#8131bd] uppercase text-sm text-white">
+            {isEditIndex ? (
+              <th className="border border-black w-6 px-2 py-1">Orden</th>
+            ) : null}
+            {isEditIndex ? (
+              <th className="border border-black w-6 px-2 py-1">cambiar</th>
+            ) : null}
             <th className="border border-black w-6 px-2 py-1">#</th>
             <th className="border border-black min-w-fit px-2 py-1">Cliente</th>
             <th className="border border-black min-w-fit px-2 py-1 whitespace-nowrap">
@@ -207,11 +301,39 @@ export const TablaClientes = ({ datos, usuarioRuta, setUsuarioRuta }) => {
           {Array.isArray(clientes) && clientes.length > 0 ? (
             clientes.map((item, index) => (
               <tr
-                key={index}
+                key={item.uid}
                 className={`${
                   index % 2 === 0 ? "bg-gray-300" : "bg-gray-100"
                 } border border-black text-sm font-semibold py-2`}
               >
+                {isEditIndex ? (
+                  <td className="items-center uppercase border-black flex justify-center px-1 py-2">
+                    <input
+                      type="number"
+                      placeholder={item.posicion}
+                      className="w-full text-center border border-black focus:outline-none"
+                      value={inputValues[item.uid] || ""}
+                      onChange={(e) =>
+                        handleChangeOrder(
+                          item.uid,
+                          parseInt(e.target.value, 10) - 1
+                        )
+                      }
+                    />
+                  </td>
+                ) : null}
+
+                {isEditIndex ? (
+                  <td className="px-2 py-2 border border-black">
+                    <button
+                      onClick={handleButtonClick}
+                      className="border w-full border-black bg-green-500 rounded-md"
+                    >
+                      OK
+                    </button>
+                  </td>
+                ) : null}
+
                 <td
                   className={`${
                     item.cuotasAtrasadas >= 2 && item.cuotasAtrasadas <= 7

@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { Navbar } from "../../components/NavBar";
 import { miContexto } from "../../context/AppContext";
 import { TablaMovimientosModal } from "./components/TablaMovimientosModal";
+import { format } from "date-fns";
 
 export const EstadisticasPage = () => {
   const { usuarioRuta, formatDate, infoClientes } = useContext(miContexto);
@@ -26,6 +27,49 @@ export const EstadisticasPage = () => {
   const ganancias =
     parseInt(usuarioRuta?.saldoInicial) - parseInt(saldoMasNuevo);
 
+  const calcularTotalAbonos = () => {
+    // infoClientes es el array de clientes que contiene la propiedad 'abono'
+    if (!infoClientes || infoClientes?.length === 0) {
+      return 0; // Si no hay clientes, el total de abonos es cero
+    }
+
+    // Sumar los abonos de todos los clientes
+    const totalAbonos = infoClientes?.reduce(
+      (acumulador, cliente) => acumulador + (cliente.abono || 0),
+      0
+    );
+
+    return totalAbonos;
+  };
+
+  // Obtener el total de abonos llamando a la función
+  const totalAbonos = calcularTotalAbonos();
+
+  const fechaHoy = format(new Date(), "dd/MM/yyyy");
+
+  const calcularPrestamoDelDia = () => {
+    // infoClientes es el array de clientes que contiene la propiedad 'valorPrestamo'
+    if (!infoClientes || infoClientes?.length === 0) {
+      return 0; // Si no hay clientes, el total de préstamos es cero
+    }
+
+    // Filtrar los clientes cuya fecha sea igual a la fecha de hoy
+    const clientesDelDia = infoClientes?.filter(
+      (cliente) => cliente.fechaActual === fechaHoy
+    );
+
+    // Sumar los valores de 'valorPrestamo' de los clientes del día
+    const prestamoDelDia = clientesDelDia?.reduce(
+      (acumulador, cliente) => acumulador + (cliente.valorPrestamo || 0),
+      0
+    );
+
+    return prestamoDelDia;
+  };
+
+  // Obtener el total de préstamos del día llamando a la función
+  const prestamoDelDia = calcularPrestamoDelDia();
+
   return (
     <>
       {mostrarMovimientos ? (
@@ -47,11 +91,9 @@ export const EstadisticasPage = () => {
             Ultimo saldo ingresado:{" "}
             <span className="font-bold">
               ${saldoMasNuevo ? saldoMasNuevo : ""}
-            </span>
-          </p>
-          <p>
-            Fecha:{" "}
-            <span className="font-bold">
+            </span>{" "}
+            -{" "}
+            <span className="font-semibold text-sm">
               {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
             </span>
           </p>
@@ -61,7 +103,16 @@ export const EstadisticasPage = () => {
           </p>
           <p>
             Total Clientes:{" "}
-            <span className="font-bold">{infoClientes.length}</span>
+            <span className="font-bold">{infoClientes?.length}</span>
+          </p>
+
+          <p>
+            Cobro del dia: <span className="font-bold">${totalAbonos}</span>
+          </p>
+
+          <p>
+            Prestamos del dia:{" "}
+            <span className="font-bold">${prestamoDelDia}</span>
           </p>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { HiOutlinePhotograph } from "react-icons/hi";
 import { IoIosClose } from "react-icons/io";
 import { AiOutlineUser } from "react-icons/ai";
@@ -12,10 +12,13 @@ import { MoonLoader } from "react-spinners";
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   updateDoc,
 } from "firebase/firestore";
+import { miContexto } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 export const EditarClienteModal = ({
   setIsModalEdit,
@@ -55,6 +58,7 @@ export const EditarClienteModal = ({
   });
   const opcionesFormaPago = ["diario", "semanal", "mensual"];
   const [isSubmiting, setIsSubmiting] = useState(false);
+  const { setRutasData } = useContext(miContexto);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -243,6 +247,9 @@ export const EditarClienteModal = ({
         selectedCliente.uid
       );
 
+      const clienteSnapshot = await getDoc(clienteRef);
+      const clienteData = clienteSnapshot.data();
+
       const allClienteRef = doc(
         db,
         "admin_users",
@@ -266,6 +273,49 @@ export const EditarClienteModal = ({
         imageTienda: datosCliente.imageTienda,
       });
 
+      const rutaRef = doc(
+        db,
+        "admin_users",
+        usuarioRuta.adminUid,
+        "rutas",
+        usuarioRuta.uid
+      );
+
+      const rutaSnapshot = await getDoc(rutaRef);
+      const rutaData = rutaSnapshot.data();
+
+      let valor;
+      let descripcion;
+      let montoFinal;
+
+      if (clienteData.valorPrestamo > datosCliente.valorPrestamo) {
+        const resta = clienteData.valorPrestamo - datosCliente.valorPrestamo;
+        valor = rutaData.saldoInicial + resta;
+        descripcion = "Prestamo Editado (resta)";
+        montoFinal = clienteData.valorPrestamo - datosCliente.valorPrestamo;
+      }
+
+      if (datosCliente.valorPrestamo > clienteData.valorPrestamo) {
+        const resta = datosCliente.valorPrestamo - clienteData.valorPrestamo;
+        valor = rutaData.saldoInicial - resta;
+        descripcion = "Prestamo Editado (suma)";
+        montoFinal = datosCliente.valorPrestamo - clienteData.valorPrestamo;
+      }
+
+      await updateDoc(rutaRef, {
+        ...rutaData,
+        saldoInicial: valor,
+        movimientos: [
+          {
+            monto: montoFinal,
+            fecha: new Date(),
+            responsable: "Admin",
+            descripcion: descripcion,
+          },
+          ...rutaData.movimientos,
+        ],
+      });
+
       setClientes((prevClientes) =>
         prevClientes.map((cliente) =>
           cliente.uid === selectedCliente.uid
@@ -273,6 +323,28 @@ export const EditarClienteModal = ({
             : cliente
         )
       );
+
+      setRutasData((prevRutas) =>
+        prevRutas.map((ruta) =>
+          ruta.uid === rutaData.uid
+            ? {
+                ...ruta,
+                saldoInicial: valor,
+                movimientos: [
+                  {
+                    monto: montoFinal,
+                    fecha: new Date(),
+                    responsable: "Admin",
+                    descripcion: descripcion,
+                  },
+                  ...ruta.movimientos,
+                ],
+              }
+            : ruta
+        )
+      );
+
+      toast.success("Cliente editado con exito");
 
       setIsSubmiting(false);
       setIsModalEdit(false);

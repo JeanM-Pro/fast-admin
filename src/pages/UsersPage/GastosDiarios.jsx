@@ -44,12 +44,30 @@ export const GastosDiarios = () => {
         ...rutaData,
         saldoInicial: saldoNuevo,
         historialGastos: nuevoHistorialGastos,
+        movimientos: [
+          {
+            monto: valor,
+            fecha: new Date(),
+            responsable: rutaData.responsable,
+            descripcion: "Gasto D",
+          },
+          ...rutaData.movimientos,
+        ],
       });
 
       setUsuarioRuta({
         ...usuarioRuta,
         saldoInicial: saldoNuevo,
         historialGastos: nuevoHistorialGastos,
+        movimientos: [
+          {
+            monto: valor,
+            fecha: new Date(),
+            responsable: rutaData.responsable,
+            descripcion: "Gasto D",
+          },
+          ...usuarioRuta.movimientos,
+        ],
       });
     } catch (error) {
       console.error("Error al agregar el gasto:", error.message);

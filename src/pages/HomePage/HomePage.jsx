@@ -16,6 +16,7 @@ export const HomePage = () => {
   const [isModalCreateRuta, setIsModalCreateRuta] = useState(false);
   const [isModalCreateClienteNew, setisModalCreateClienteNew] = useState(false);
   const [isModalCreateCliente, setisModalCreateCliente] = useState(false);
+  const [isEditIndex, setisEditIndex] = useState(false);
   const [isModalCreateClienteExistente, setIsModalCreateClienteExistente] =
     useState(false);
   const navigate = useNavigate();
@@ -201,9 +202,33 @@ export const HomePage = () => {
         )}
 
         {usuarioRuta && (
-          <h2 className="text-center text-lg font-bold uppercase mt-4">
-            {usuarioRuta.nombreRuta}
-          </h2>
+          <div className="w-full flex justify-center items-center relative mt-6">
+            <div className="absolute left-0 flex ">
+              {!isEditIndex ? (
+                <button
+                  type="button"
+                  className="bg-white font-semibold  w-fit text-[#8131bd] px-2 py-1 rounded-md flex justify-center items-center min-w-[80px] shadow-lg"
+                  onClick={() => setisEditIndex(true)}
+                >
+                  Ordenar lista
+                </button>
+              ) : null}
+
+              {isEditIndex ? (
+                <button
+                  type="button"
+                  className="bg-white font-semibold  w-fit text-[#8131bd] px-2 py-1 rounded-md flex justify-center items-center min-w-[80px] shadow-lg"
+                  onClick={() => setisEditIndex(false)}
+                >
+                  Terminar
+                </button>
+              ) : null}
+            </div>
+
+            <h2 className="text-lg font-bold uppercase">
+              {usuarioRuta.nombreRuta}
+            </h2>
+          </div>
         )}
 
         {user?.email === "jeancenteno54@fastadmin.com" && (
@@ -217,16 +242,18 @@ export const HomePage = () => {
 
         {userData?.isAdmin && (
           <div className="w-full px-2 overflow-x-auto py-2">
-            <TablaAdministradores datos={rutasData || []} />
+            <TablaAdministradores />
           </div>
         )}
 
         {infoClientes && (
-          <div className="w-full px-2 overflow-x-auto py-2">
+          <div className="w-full overflow-x-auto py-2">
             <TablaClientes
               datos={infoClientes}
               usuarioRuta={usuarioRuta}
               setUsuarioRuta={setUsuarioRuta}
+              isEditIndex={isEditIndex}
+              setisEditIndex={setisEditIndex}
             />
           </div>
         )}

@@ -33,25 +33,12 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                 <td className="items-center whitespace-nowrap border-black flex justify-center px-1 py-1">
                   {formatDate(item.fecha)}
                 </td>
-                <td className="border border-black text-center px-2 py-1">
+                <td className="border border-black text-center px-2 py-1 whitespace-nowrap">
                   {item.descripcion}
                 </td>
                 <td className="border border-black text-center px-2 py-1 whitespace-nowrap">
                   {item.responsable}
                 </td>
-
-                {/* <td className="border border-black w-10 text-center px-2 py-1">
-                <AiOutlineEdit
-                  onClick={() => handleEditClick(item)}
-                  className="cursor-pointer my-0 mx-auto"
-                />
-              </td>
-              <td className="border border-black w-10  px-2 py-1">
-                <AiOutlineDelete
-                  className="cursor-pointer my-0 mx-auto"
-                  onClick={() => handleDeleteClick(item)}
-                />
-              </td> */}
               </tr>
             ))
           ) : (
