@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { TablaGastos } from "../../components/TablaGastos";
 
 export const GastosDiarios = () => {
-  const [valor, setValor] = useState(0);
+  const [valor, setValor] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
@@ -74,7 +74,7 @@ export const GastosDiarios = () => {
     } finally {
       setIsAdding(false);
       toast.success("Gasto agregado con éxito");
-      setValor(0);
+      setValor("");
       setDescripcion("");
     }
   };
@@ -101,6 +101,7 @@ export const GastosDiarios = () => {
                 </div>
                 <input
                   type="number"
+                  value={valor}
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
                   onChange={(e) => setValor(parseInt(e.target.value))}
                   required
@@ -112,6 +113,7 @@ export const GastosDiarios = () => {
                 </div>
                 <input
                   type="text"
+                  value={descripcion}
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
                   onChange={(e) => setDescripcion(e.target.value)}
                   required
