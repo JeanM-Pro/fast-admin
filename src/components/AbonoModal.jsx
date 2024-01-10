@@ -15,7 +15,7 @@ export const AbonoModal = ({
   const [abono, setAbono] = useState(0);
   const fechaHoy = format(new Date(), "dd/MM/yyyy");
   const pagoHoy = selectedAbono.historialPagos.some(
-    (pago) => format(pago.fecha, "dd/MM/yyyy") === fechaHoy
+    (pago) => format(pago.fecha.toDate(), "dd/MM/yyyy") === fechaHoy
   );
 
   const handleAbonar = async () => {
