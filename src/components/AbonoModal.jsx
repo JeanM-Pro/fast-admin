@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MoonLoader } from "react-spinners";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { format } from "date-fns";
+import { miContexto } from "../context/AppContext";
 
 export const AbonoModal = ({
   setIsAbono,
@@ -11,13 +12,22 @@ export const AbonoModal = ({
   setUsuarioRuta,
   setSelectedAbono,
 }) => {
+  const { formatDate2 } = useContext(miContexto);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [abono, setAbono] = useState(0);
+  const [pagoHoy, setPagoHoy] = useState(false);
   const fechaHoy = format(new Date(), "dd/MM/yyyy");
-  const pagoHoy = selectedAbono.historialPagos.some(
-    (pago) => format(pago.fecha.toDate(), "dd/MM/yyyy") === fechaHoy
+  const pagos = selectedAbono.historialPagos.map((pago) =>
+    formatDate2(pago.fecha)
   );
 
+  const pagoFiltrado = pagos.filter((pago) => pago === fechaHoy).join(", ");
+
+  useEffect(() => {
+    if (fechaHoy === pagoFiltrado) {
+      setPagoHoy(true);
+    }
+  }, [fechaHoy, pagoFiltrado]);
   const handleAbonar = async () => {
     try {
       setIsSubmiting(true);

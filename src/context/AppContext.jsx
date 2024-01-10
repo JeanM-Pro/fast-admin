@@ -198,6 +198,26 @@ export const AppContext = ({ children }) => {
     }`;
   }
 
+  const formatDate2 = (fecha) => {
+    let fechaJavaScript;
+
+    // Verificar si la fecha ya es una instancia de Date
+    if (fecha instanceof Date) {
+      fechaJavaScript = fecha;
+    } else {
+      // Si no es una instancia de Date, intentar parsear la cadena
+      fechaJavaScript = new Date(
+        fecha?.seconds * 1000 + fecha?.nanoseconds / 1e6
+      );
+    }
+
+    const dia = fechaJavaScript.getDate();
+    const mes = fechaJavaScript.getMonth() + 1;
+    const ano = fechaJavaScript.getFullYear();
+
+    return `${dia <= 9 ? `0${dia}` : dia}/${mes <= 9 ? `0${mes}` : mes}/${ano}`;
+  };
+
   return (
     <miContexto.Provider
       value={{
@@ -213,6 +233,7 @@ export const AppContext = ({ children }) => {
         isLogouting,
         formatDate,
         setUsersAdminData,
+        formatDate2,
       }}
     >
       {children}
