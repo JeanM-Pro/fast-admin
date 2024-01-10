@@ -13,7 +13,7 @@ import { FcStatistics } from "react-icons/fc";
 export const Navbar = () => {
   const [toggleNavbar, setToggleNavbar] = useState(false);
   const [animationNavbar, setAnimationNavbar] = useState(false);
-  const { handleLogout, isLogouting } = useContext(miContexto);
+  const { handleLogout, isLogouting, userData } = useContext(miContexto);
   const navigate = useNavigate();
 
   const handleToggleNavbar = () => {
@@ -58,14 +58,18 @@ export const Navbar = () => {
                   Inicio
                 </NavLink>
               </li>
-              <li>
-                <NavLink
-                  className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
-                  to={"/gastos-diarios"}
-                >
-                  Gastos Diarios
-                </NavLink>
-              </li>
+
+              {!userData?.isAdmin ? (
+                <li>
+                  <NavLink
+                    className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
+                    to={"/gastos-diarios"}
+                  >
+                    Gastos Diarios
+                  </NavLink>
+                </li>
+              ) : null}
+
               <li>
                 <NavLink
                   className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
@@ -111,15 +115,17 @@ export const Navbar = () => {
                 Inicio
               </NavLink>
 
-              <NavLink
-                to="/gastos-diarios"
-                className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
-                  ruta === "/gastos-diarios" ? "bg-[#8131bd] text-white" : ""
-                }`}
-              >
-                <FaMoneyCheckDollar className="mr-2" size={25} />
-                Gastos diarios
-              </NavLink>
+              {!userData?.isAdmin ? (
+                <NavLink
+                  to="/gastos-diarios"
+                  className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
+                    ruta === "/gastos-diarios" ? "bg-[#8131bd] text-white" : ""
+                  }`}
+                >
+                  <FaMoneyCheckDollar className="mr-2" size={25} />
+                  Gastos diarios
+                </NavLink>
+              ) : null}
 
               <NavLink
                 to="/estadisticas"

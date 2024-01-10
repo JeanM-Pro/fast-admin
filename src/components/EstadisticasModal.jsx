@@ -98,6 +98,10 @@ export const EstadisticasModal = ({
               Ultimo saldo ingresado:{" "}
               <span className="font-bold">
                 ${saldoMasNuevo ? saldoMasNuevo : ""}
+              </span>{" "}
+              -{" "}
+              <span className="font-semibold text-sm">
+                {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
               </span>
             </p>
             <p>

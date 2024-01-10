@@ -1,8 +1,15 @@
-import { deleteDoc, doc, getFirestore } from "firebase/firestore";
-import React, { useState } from "react";
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
+import React, { useContext, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MoonLoader } from "react-spinners";
 import { toast } from "react-toastify";
+import { miContexto } from "../context/AppContext";
 
 export const ModalDeleteCliente = ({
   setIsModalDelete,
@@ -13,6 +20,7 @@ export const ModalDeleteCliente = ({
   setClientes,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { setRutasData } = useContext(miContexto);
 
   const deleteCliente = async () => {
     setIsDeleting(true);
@@ -27,6 +35,36 @@ export const ModalDeleteCliente = ({
       selectedCliente.uid
     );
 
+    const clienteSnapshot = await getDoc(clienteRef);
+    const clienteData = clienteSnapshot.data();
+
+    const rutaRef = doc(
+      db,
+      "admin_users",
+      userData.uid,
+      "rutas",
+      usuarioRuta.uid
+    );
+
+    const rutaSnapshot = await getDoc(rutaRef);
+    const rutaData = rutaSnapshot.data();
+
+    if (clienteData.cuotasPagadas === 0) {
+      await updateDoc(rutaRef, {
+        ...rutaData,
+        saldoInicial: rutaData.saldoInicial + clienteData.valorPrestamo,
+        movimientos: [
+          {
+            monto: clienteData.valorPrestamo,
+            fecha: new Date(),
+            responsable: "Admin",
+            descripcion: "Cliente eliminado",
+          },
+          ...rutaData.movimientos,
+        ],
+      });
+    }
+
     try {
       // Eliminar cliente de Firebase
       await deleteDoc(clienteRef);
@@ -36,6 +74,26 @@ export const ModalDeleteCliente = ({
         (cliente) => cliente.uid !== selectedCliente.uid
       );
       setClientes(updatedClienteData);
+
+      setRutasData((prevRutas) =>
+        prevRutas.map((ruta) =>
+          ruta.uid === rutaData.uid
+            ? {
+                ...ruta,
+                saldoInicial: rutaData.saldoInicial + clienteData.valorPrestamo,
+                movimientos: [
+                  {
+                    monto: clienteData.valorPrestamo,
+                    fecha: new Date(),
+                    responsable: "Admin",
+                    descripcion: "Cliente eliminado",
+                  },
+                  ...ruta.movimientos,
+                ],
+              }
+            : ruta
+        )
+      );
 
       // Cerrar el modal
       setIsModalDelete(false);
