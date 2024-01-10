@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MoonLoader } from "react-spinners";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
+import { format } from "date-fns";
 
 export const AbonoModal = ({
   setIsAbono,
@@ -12,6 +13,10 @@ export const AbonoModal = ({
 }) => {
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [abono, setAbono] = useState(0);
+  const fechaHoy = format(new Date(), "dd/MM/yyyy");
+  const pagoHoy = selectedAbono.historialPagos.some(
+    (pago) => format(pago.fecha, "dd/MM/yyyy") === fechaHoy
+  );
 
   const handleAbonar = async () => {
     try {
@@ -140,23 +145,32 @@ export const AbonoModal = ({
         <h2 className="text-center text-xl font-semibold">
           Ingresar abono diario
         </h2>
-        <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
-          <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-            Abonar $
+        {!pagoHoy ? (
+          <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
+            <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+              Abonar $
+            </div>
+            <input
+              type="number"
+              className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
+              onChange={(e) => setAbono(parseInt(e.target.value))}
+            />
           </div>
-          <input
-            type="number"
-            className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-            onChange={(e) => setAbono(parseInt(e.target.value))}
-          />
-        </div>
-        <button
-          className="bg-[#8131bd] w-fit mt-4 text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-          disabled={isSubmiting}
-          onClick={handleAbonar}
-        >
-          {isSubmiting ? <MoonLoader size={20} color="#ffffff" /> : "Abonar"}
-        </button>
+        ) : (
+          <h2 className="font-semibold text-lg mt-1 text-red-500">
+            Este cliente ya abonó hoy
+          </h2>
+        )}
+
+        {!pagoHoy ? (
+          <button
+            className="bg-[#8131bd] w-fit mt-4 text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+            disabled={isSubmiting || pagoHoy}
+            onClick={handleAbonar}
+          >
+            {isSubmiting ? <MoonLoader size={20} color="#ffffff" /> : "Abonar"}
+          </button>
+        ) : null}
       </div>
     </div>
   );

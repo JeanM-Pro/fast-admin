@@ -24,7 +24,6 @@ export const HomePage = () => {
   const {
     usersAdminData,
     userData,
-    rutasData,
     usuarioRuta,
     setUsuarioRuta,
     infoClientes,
