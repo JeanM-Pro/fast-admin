@@ -3,10 +3,40 @@ import { Navbar } from "../../components/NavBar";
 import { miContexto } from "../../context/AppContext";
 import { TablaMovimientosModal } from "./components/TablaMovimientosModal";
 import { format } from "date-fns";
+import { ModalCambiarContrasena } from "../../components/ModalCambiarContrasena";
 
 export const EstadisticasPage = () => {
-  const { usuarioRuta, formatDate, infoClientes } = useContext(miContexto);
+  const { usuarioRuta, formatDate, infoClientes, rutasData, userData } =
+    useContext(miContexto);
   const [mostrarMovimientos, setMostrarMovimientos] = useState(false);
+  const [verCambiarContrasenaModal, setverCambiarContrasenaModal] =
+    useState(false);
+
+  const saldoRutas = rutasData?.reduce(
+    (total, ruta) => total + ruta.saldoInicial,
+    0
+  );
+
+  const ultimoSaldo = rutasData?.reduce((total, ruta) => {
+    // Verifica si hay algún historial de saldos
+    if (ruta.historialSaldos && ruta.historialSaldos.length > 0) {
+      // Ordena el historial de saldos por fecha de forma descendente
+      const historialOrdenado = ruta.historialSaldos.sort(
+        (a, b) => new Date(b.fecha) - new Date(a.fecha)
+      );
+
+      // Toma el saldo más reciente
+      const saldoMasReciente = historialOrdenado[0].saldo;
+
+      // Suma el saldo más reciente al total
+      return total + parseFloat(saldoMasReciente); // Convierte a número
+    }
+
+    // Si no hay historial de saldos, retorna el total sin cambios
+    return total;
+  }, 0);
+
+  const gananciasRutas = saldoRutas - ultimoSaldo;
 
   const compararFechas = (a, b) => {
     const fechaA = new Date(a.fecha.seconds * 1000 + a.fecha.nanoseconds / 1e6);
@@ -72,6 +102,12 @@ export const EstadisticasPage = () => {
 
   return (
     <>
+      {verCambiarContrasenaModal ? (
+        <ModalCambiarContrasena
+          setverCambiarContrasenaModal={setverCambiarContrasenaModal}
+        />
+      ) : null}
+
       {mostrarMovimientos ? (
         <TablaMovimientosModal
           formatDate={formatDate}
@@ -85,44 +121,80 @@ export const EstadisticasPage = () => {
         <div>
           <p>
             Saldo Actual:{" "}
-            <span className="font-bold">${usuarioRuta?.saldoInicial}</span>
+            <span className="font-bold">
+              $
+              {usuarioRuta?.saldoInicial
+                ? usuarioRuta?.saldoInicial
+                : saldoRutas}
+            </span>
           </p>
+
           <p>
             Ultimo saldo ingresado:{" "}
             <span className="font-bold">
-              ${saldoMasNuevo ? saldoMasNuevo : ""}
-            </span>{" "}
-            -{" "}
+              ${saldoMasNuevo ? saldoMasNuevo : ultimoSaldo}
+            </span>
+            {saldoMasNuevo ? " - " : null}
             <span className="font-semibold text-sm">
               {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
             </span>
           </p>
-          <p>
-            Ganancias:{" "}
-            <span className="font-bold">${ganancias >= 0 ? ganancias : 0}</span>
-          </p>
-          <p>
-            Total Clientes:{" "}
-            <span className="font-bold">{infoClientes?.length}</span>
-          </p>
 
-          <p>
-            Cobro del dia: <span className="font-bold">${totalAbonos}</span>
-          </p>
+          {userData ? (
+            <p>
+              Ganancias:
+              <span className="font-bold ml-1">
+                ${gananciasRutas >= 0 ? gananciasRutas : 0}
+              </span>
+            </p>
+          ) : (
+            <p>
+              Ganancias:
+              <span className="font-bold ml-1">
+                ${ganancias >= 0 ? ganancias : 0}
+              </span>
+            </p>
+          )}
 
-          <p>
-            Prestamos del dia:{" "}
-            <span className="font-bold">${prestamoDelDia}</span>
-          </p>
+          {userData ? (
+            <p>
+              Total rutas:
+              <span className="font-bold ml-1">{rutasData?.length}</span>
+            </p>
+          ) : (
+            <p>
+              Total Clientes:
+              <span className="font-bold ml-1">{infoClientes?.length}</span>
+            </p>
+          )}
+
+          {userData ? (
+            <button
+              type="button"
+              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+              onClick={() => setverCambiarContrasenaModal(true)}
+            >
+              Cambiar Contraseña
+            </button>
+          ) : (
+            <>
+              <p>
+                Cobro del dia: <span className="font-bold">${totalAbonos}</span>
+              </p>
+              <p>
+                Prestamos del dia:{" "}
+                <span className="font-bold">${prestamoDelDia}</span>
+              </p>
+              <button
+                type="button"
+                className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+                onClick={() => setMostrarMovimientos(true)}
+              >
+                Movimientos
+              </button>
+            </>
+          )}
         </div>
-
-        <button
-          type="button"
-          className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-          onClick={() => setMostrarMovimientos(true)}
-        >
-          Movimientos
-        </button>
       </div>
     </>
   );

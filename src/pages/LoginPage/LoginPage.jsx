@@ -33,7 +33,7 @@ export const LoginPage = ({ setUser }) => {
       toast.success("Inicio de sesión exitoso");
       window.location.reload();
     } catch (error) {
-      toast.error("El email o la contraseña son incorrectos.");
+      toast.error("El usuario o la contraseña son incorrectos.");
       console.error("Error de inicio de sesión:", error.message);
     } finally {
       setisSubmiting(false);
