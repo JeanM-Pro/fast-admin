@@ -12,7 +12,7 @@ export const AbonoModal = ({
   setUsuarioRuta,
   setSelectedAbono,
 }) => {
-  const { formatDate2 } = useContext(miContexto);
+  const { formatDate2, userData } = useContext(miContexto);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [abono, setAbono] = useState(0);
   const [pagoHoy, setPagoHoy] = useState(false);
@@ -21,13 +21,14 @@ export const AbonoModal = ({
     formatDate2(pago.fecha)
   );
 
-  const pagoFiltrado = pagos.filter((pago) => pago === fechaHoy).join(", ");
+  const pagoFiltrado = pagos.filter((pago) => pago === fechaHoy);
 
   useEffect(() => {
-    if (fechaHoy === pagoFiltrado) {
+    if (fechaHoy === pagoFiltrado[0]) {
       setPagoHoy(true);
     }
   }, [fechaHoy, pagoFiltrado]);
+
   const handleAbonar = async () => {
     try {
       setIsSubmiting(true);
@@ -54,9 +55,42 @@ export const AbonoModal = ({
 
       //Calcular las cuotas y el valor pico
 
-      const totalAbono = selectedAbono.valorPico + abono;
-      const vecesSuperado = Math.floor(totalAbono / selectedAbono.pagoDiario);
-      const sobrante = totalAbono % selectedAbono.pagoDiario;
+      let totalAbono;
+      let vecesSuperado;
+      let sobrante;
+
+      if (userData?.isAdmin !== undefined) {
+        if (clienteData.abono > abono) {
+          const vecesSuperadoAnterior = Math.floor(
+            clienteData.abono / selectedAbono.pagoDiario
+          );
+          const veceSuperadoActual = Math.floor(
+            abono / selectedAbono.pagoDiario
+          );
+          const cuenta = vecesSuperadoAnterior - veceSuperadoActual;
+          vecesSuperado = selectedAbono.cuotasPagadas - cuenta;
+          totalAbono = abono;
+          sobrante = abono % selectedAbono.pagoDiario;
+        }
+
+        if (clienteData.abono < abono) {
+          totalAbono = abono;
+          const vecesSuperadoAnterior = Math.floor(
+            clienteData.abono / selectedAbono.pagoDiario
+          );
+          const veceSuperadoActual = Math.floor(
+            abono / selectedAbono.pagoDiario
+          );
+          const resultSuperados = veceSuperadoActual - vecesSuperadoAnterior;
+          vecesSuperado = clienteData.cuotasPagadas + resultSuperados;
+          sobrante = abono % selectedAbono.pagoDiario;
+        }
+      } else {
+        totalAbono = selectedAbono.valorPico + abono;
+        const sumar = Math.floor(totalAbono / selectedAbono.pagoDiario);
+        vecesSuperado = selectedAbono.cuotasPagadas + sumar;
+        sobrante = totalAbono % selectedAbono.pagoDiario;
+      }
 
       // Calcular cuotas a restar, asegurándote de que no sea un número negativo
       const cuotasAtrasadasToSubtract = Math.max(
@@ -78,17 +112,34 @@ export const AbonoModal = ({
       const rutaData = rutaSnapshot.data();
 
       const saldoViejoNum = parseInt(usuarioRuta.saldoInicial);
-      const saldoNuevo = saldoViejoNum + abono;
+      // const saldoNuevo = saldoViejoNum + abono;
+      let valor;
+      let descripcion;
+      let montoFinal;
+
+      if (clienteData.abono > abono) {
+        const resta = clienteData.abono - abono;
+        valor = saldoViejoNum - resta;
+        descripcion = "Abono Editado (resta)";
+        montoFinal = resta;
+      }
+
+      if (abono > clienteData.abono) {
+        const resta = abono - clienteData.abono;
+        valor = saldoViejoNum + resta;
+        descripcion = "Abono Editado (suma)";
+        montoFinal = resta;
+      }
 
       await updateDoc(rutaRef, {
         ...rutaData,
-        saldoInicial: saldoNuevo,
+        saldoInicial: valor,
         movimientos: [
           {
-            monto: abono,
+            monto: montoFinal,
             fecha: new Date(),
             responsable: clienteData.nombreCliente,
-            descripcion: "Abono Cliente",
+            descripcion: userData?.isAdmin ? descripcion : "abono cliente",
           },
           ...rutaData.movimientos,
         ],
@@ -98,13 +149,13 @@ export const AbonoModal = ({
 
       setUsuarioRuta({
         ...usuarioRuta,
-        saldoInicial: saldoNuevo,
+        saldoInicial: valor,
         movimientos: [
           {
-            monto: abono,
+            monto: montoFinal,
             fecha: new Date(),
             responsable: clienteData.nombreCliente,
-            descripcion: "Abono Cliente",
+            descripcion: userData?.isAdmin ? descripcion : "abono cliente",
           },
           ...usuarioRuta.movimientos,
         ],
@@ -115,26 +166,67 @@ export const AbonoModal = ({
         fecha: new Date(),
       };
 
+      let historialPagosActualizado;
+
+      if (userData?.isAdmin) {
+        // Filtrar el historial por la fecha de hoy si el usuario es un administrador
+        historialPagosActualizado = clienteData.historialPagos.map(
+          (historial) => {
+            // Verifica si la fecha es un Timestamp y conviértelo a Date
+            const fechaPago =
+              historial.fecha instanceof Date
+                ? historial.fecha
+                : historial.fecha.toDate();
+
+            return fechaPago.toISOString().split("T")[0] ===
+              new Date().toISOString().split("T")[0]
+              ? { fecha: new Date(), abono: abono }
+              : historial;
+          }
+        );
+      } else {
+        // Si el usuario no es un administrador, simplemente agrega el nuevo historial
+        historialPagosActualizado = [
+          ...clienteData.historialPagos,
+          nuevoHistorial,
+        ];
+      }
+
+      let totalAbonoEdit;
+      if (clienteData.abono > abono) {
+        const cuenta = clienteData.abono - abono;
+        totalAbonoEdit = clienteData.totalAbono - cuenta;
+      }
+
+      if (abono > clienteData.abono) {
+        const cuenta = abono - clienteData.abono;
+        totalAbonoEdit = clienteData.totalAbono + cuenta;
+      }
+
       // Actualiza los datos en el documento manteniendo los datos originales no editados
       await updateDoc(clienteRef, {
         ...clienteData,
         abono: abono,
-        cuotasPagadas: selectedAbono.cuotasPagadas + vecesSuperado,
+        cuotasPagadas: vecesSuperado,
         fechaUltimoAbono: fechaFormateada,
         valorPico: sobrante,
-        totalAbono: selectedAbono.totalAbono + abono,
+        totalAbono: userData?.isAdmin
+          ? totalAbonoEdit
+          : selectedAbono.totalAbono + abono,
         cuotasAtrasadas: cuotasAtrasadasToSubtract,
-        historialPagos: [...clienteData.historialPagos, nuevoHistorial],
+        historialPagos: historialPagosActualizado,
       });
       setSelectedAbono({
         ...selectedAbono,
         abono: abono,
-        cuotasPagadas: selectedAbono.cuotasPagadas + vecesSuperado,
+        cuotasPagadas: vecesSuperado,
         fechaUltimoAbono: fechaFormateada,
         valorPico: sobrante,
-        totalAbono: selectedAbono.totalAbono + abono,
+        totalAbono: userData?.isAdmin
+          ? totalAbonoEdit
+          : selectedAbono.totalAbono + abono,
         cuotasAtrasadas: cuotasAtrasadasToSubtract,
-        historialPagos: [...clienteData.historialPagos, nuevoHistorial],
+        historialPagos: historialPagosActualizado,
       });
       setIsAbono(false);
     } catch (error) {
@@ -153,9 +245,9 @@ export const AbonoModal = ({
           onClick={() => setIsAbono(false)}
         />
         <h2 className="text-center text-xl font-semibold">
-          Ingresar abono diario
+          {userData?.isAdmin ? "Editar abono diario" : "Ingresar abono diario"}
         </h2>
-        {!pagoHoy ? (
+        {!pagoHoy || userData?.isAdmin ? (
           <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
             <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
               Abonar $
@@ -172,10 +264,10 @@ export const AbonoModal = ({
           </h2>
         )}
 
-        {!pagoHoy ? (
+        {!pagoHoy || userData?.isAdmin ? (
           <button
             className="bg-[#8131bd] w-fit mt-4 text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-            disabled={isSubmiting || pagoHoy}
+            disabled={isSubmiting}
             onClick={handleAbonar}
           >
             {isSubmiting ? <MoonLoader size={20} color="#ffffff" /> : "Abonar"}

@@ -104,12 +104,7 @@ export const EstadisticasModal = ({
                 {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
               </span>
             </p>
-            <p>
-              Fecha:{" "}
-              <span className="font-bold">
-                {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
-              </span>
-            </p>
+
             <p>
               Ganancias:{" "}
               <span className="font-bold">

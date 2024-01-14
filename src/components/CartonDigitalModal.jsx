@@ -52,11 +52,19 @@ export const CartonDigitalModal = ({ setMostrarCartonDigital, datos }) => {
                 {numero}
               </span>
               {valorPicoDisplay !== null && numero === datos.cuotasPagadas + 1
-                ? valorPicoDisplay
+                ? `$${valorPicoDisplay}`
                 : null}
               {numero <= datos.cuotasPagadas ? (
                 <p className="uppercase text-xs">Pagado</p>
               ) : null}
+
+              {(valorPicoDisplay !== null &&
+                numero === datos.cuotasPagadas + 1) ||
+              numero <= datos.cuotasPagadas ? null : (
+                <span className="opacity-30 font-semibold">
+                  ${datos.pagoDiario}
+                </span>
+              )}
             </div>
           ))}
         </div>
