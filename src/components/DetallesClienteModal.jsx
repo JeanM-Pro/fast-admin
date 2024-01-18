@@ -47,6 +47,15 @@ export const DetallesClienteModal = ({
     { titulo: "deuda restante" },
   ];
 
+  const valorPico =
+    selectedDetallesCliente.totalAbono % selectedDetallesCliente.pagoDiario;
+
+  const cuotasPagadas = Math.floor(
+    selectedDetallesCliente.totalAbono / selectedDetallesCliente.pagoDiario
+  );
+
+  const cuotasRestantes = totalCuotas - cuotasPagadas;
+
   return (
     <>
       {mostrarCartonDigital ? (
@@ -192,20 +201,19 @@ export const DetallesClienteModal = ({
                   {`$${selectedDetallesCliente.abono}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${selectedDetallesCliente.valorPico}`}
+                  {`$${valorPico}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
                   {`$${selectedDetallesCliente.totalAbono}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {selectedDetallesCliente.cuotasPactadas}
+                  {totalCuotas}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {selectedDetallesCliente.cuotasPagadas}
+                  {cuotasPagadas}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {selectedDetallesCliente.cuotasPactadas -
-                    selectedDetallesCliente.cuotasPagadas}
+                  {cuotasRestantes}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
                   {selectedDetallesCliente.cuotasAtrasadas}

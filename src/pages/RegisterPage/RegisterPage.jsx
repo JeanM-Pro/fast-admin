@@ -67,6 +67,7 @@ export const RegisterPage = ({ setUser }) => {
         email: createdUser.email,
         contrasena: contrasena,
         nombre: nombre,
+        uid: createdUser.uid,
       };
 
       await addDoc(adminPassRef, adminPassData);

@@ -11,6 +11,7 @@ import { TablaClientes } from "../../components/TablaClientes";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import { CrearClienteModalNew } from "./Components/Modals/CrearClientesModal/CrearClienteModalNew";
 import { CrearClienteExistenteModal } from "../../components/CrearClienteExistenteModal";
+import { actualizarCuotas } from "./actualizarCuotas";
 
 export const HomePage = () => {
   const [isModalCreateRuta, setIsModalCreateRuta] = useState(false);
@@ -19,6 +20,7 @@ export const HomePage = () => {
   const [isEditIndex, setisEditIndex] = useState(false);
   const [isModalCreateClienteExistente, setIsModalCreateClienteExistente] =
     useState(false);
+  const [primerRender, setPrimerRender] = useState(true);
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -30,74 +32,28 @@ export const HomePage = () => {
     setInfoClientes,
     setUsersAdminData,
   } = useContext(miContexto);
+  const db = getFirestore();
+
+  const handleActualizarCuotas = async () => {
+    const clientesActualizados = await actualizarCuotas({
+      infoClientes,
+      db,
+      updateDoc,
+      doc,
+      usuarioRuta,
+    });
+
+    if (clientesActualizados) {
+      setInfoClientes(clientesActualizados);
+    }
+
+    setPrimerRender(false);
+  };
 
   useEffect(() => {
-    const actualizarCuotas = async () => {
-      if (infoClientes) {
-        const db = getFirestore();
-        const batch = [];
-
-        // Utilizar una variable temporal para acumular los cambios
-        let infoClientesActualizado = infoClientes.map((cliente) => {
-          const { abono, fechaUltimoAbono } = cliente;
-          const fechaActual = new Date();
-          const fechaUltimoAbonoDate = new Date(fechaUltimoAbono);
-          fechaActual.setHours(0, 0, 0, 0);
-          fechaUltimoAbonoDate.setHours(0, 0, 0, 0);
-
-          if (abono === 0 && fechaUltimoAbonoDate < fechaActual) {
-            const cuotasAtrasadasActualizadas = cliente.cuotasAtrasadas + 1;
-            batch.push(
-              updateDoc(
-                doc(
-                  db,
-                  "admin_users",
-                  usuarioRuta.adminUid,
-                  "rutas",
-                  usuarioRuta.uid,
-                  "clientes",
-                  cliente.uid
-                ),
-                {
-                  cuotasAtrasadas: cuotasAtrasadasActualizadas,
-                }
-              )
-            );
-            return { ...cliente, cuotasAtrasadas: cuotasAtrasadasActualizadas };
-          } else if (abono > 0 && fechaUltimoAbonoDate < fechaActual) {
-            batch.push(
-              updateDoc(
-                doc(
-                  db,
-                  "admin_users",
-                  usuarioRuta.adminUid,
-                  "rutas",
-                  usuarioRuta.uid,
-                  "clientes",
-                  cliente.uid
-                ),
-                {
-                  abono: 0,
-                }
-              )
-            );
-            return { ...cliente, abono: 0 };
-          }
-
-          return cliente;
-        });
-
-        // Actualizar localmente solo después de completar el bucle
-        setInfoClientes(infoClientesActualizado);
-
-        // Actualizar en Firebase
-        await Promise.all(batch);
-      }
-    };
-
-    actualizarCuotas();
+    if (infoClientes && primerRender) handleActualizarCuotas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [primerRender, infoClientes]);
 
   const posicionArroba = userData?.email.indexOf("@");
 

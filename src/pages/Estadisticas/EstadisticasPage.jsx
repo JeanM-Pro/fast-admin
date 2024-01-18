@@ -130,7 +130,7 @@ export const EstadisticasPage = () => {
           </p>
 
           <p>
-            Ultimo saldo ingresado:{" "}
+            {userData ? "Total saldo invertido: " : "Ultimo saldo ingresado: "}
             <span className="font-bold">
               ${saldoMasNuevo ? saldoMasNuevo : ultimoSaldo}
             </span>

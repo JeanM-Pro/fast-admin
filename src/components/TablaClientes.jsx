@@ -340,10 +340,7 @@ export const TablaClientes = ({
                       ? "bg-green-500"
                       : null
                   } ${
-                    item.cuotasAtrasadas >= 8 &&
-                    item.cuotasAtrasadas <= item.cuotasPactadas
-                      ? "bg-yellow-500"
-                      : null
+                    item.cuotasAtrasadas >= 8 ? "bg-yellow-500" : null
                   } border border-black text-center px-2 py-2 ${
                     convertirFechaEnMilisegundos(item.fechaFinal) <
                     fechaActualEnMilisegundos
@@ -370,11 +367,12 @@ export const TablaClientes = ({
                 </td>
 
                 <td className="border border-black px-2 w-fit text-center py-2">
-                  {item.cuotasPagadas}
+                  {Math.floor(item.totalAbono / item.pagoDiario)}
                 </td>
 
                 <td className="border border-black px-2 w-fit text-center py-2">
-                  {item.cuotasPactadas - item.cuotasPagadas}
+                  {item.cuotasPactadas -
+                    Math.floor(item.totalAbono / item.pagoDiario)}
                 </td>
 
                 {userData?.isAdmin && (

@@ -57,7 +57,7 @@ export const CrearClienteExistenteModal = ({
     fechaUltimoAbono: fechaFormateada,
     totalAbono: 0,
     cuotasAtrasadas: 0,
-    actualizado: false,
+    actualizado: new Date().toDateString(),
     historialPagos: [],
   });
   const [isSubmiting, setIsSubmiting] = useState(false);

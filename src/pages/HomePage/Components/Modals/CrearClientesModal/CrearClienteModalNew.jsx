@@ -49,7 +49,7 @@ export const CrearClienteModalNew = ({
     fechaUltimoAbono: fechaFormateada,
     totalAbono: 0,
     cuotasAtrasadas: 0,
-    actualizado: false,
+    actualizado: new Date().toDateString(),
     historialPagos: [],
   });
 

@@ -10,6 +10,15 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
+import {
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
 export const ModalCambiarContrasena = ({ setverCambiarContrasenaModal }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -60,6 +69,40 @@ export const ModalCambiarContrasena = ({ setverCambiarContrasenaModal }) => {
 
       // Cambiar la contraseña
       await updatePassword(user, newPassword);
+
+      const db = getFirestore();
+
+      // Obtener el documento en "adminPass" asociado al usuario actual
+      const adminPassQuery = query(
+        collection(db, "adminPass"),
+        where("uid", "==", user.uid) // Suponiendo que el campo email es único
+      );
+
+      const adminPassSnapshot = await getDocs(adminPassQuery);
+
+      function isEmpty(obj) {
+        return Object.keys(obj).length === 0 && obj.constructor === Object;
+      }
+
+      if (!isEmpty(adminPassSnapshot.docs)) {
+        const adminPassRef = doc(
+          collection(db, "adminPass"),
+          adminPassSnapshot.docs[0].id
+        );
+
+        // Obtener el documento actual para mantener los datos no relacionados con la contraseña
+        const adminPassData = adminPassSnapshot.docs[0].data();
+
+        await updateDoc(adminPassRef, {
+          ...adminPassData,
+          contrasena: newPassword,
+        });
+      } else {
+        console.error(
+          "No se encontró el documento en adminPass asociado al usuario actual"
+        );
+        // Manejar el caso donde no se encuentra el documento
+      }
 
       toast.success("Contraseña cambiada exitosamente");
       setverCambiarContrasenaModal(false);
