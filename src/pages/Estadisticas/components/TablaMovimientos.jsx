@@ -1,7 +1,18 @@
-import React from "react";
+import { ImArrowUp, ImArrowDown } from "react-icons/im";
 
 export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
   const movimientos = usuarioRuta?.movimientos;
+
+  const claseColores = (descripcion) => {
+    if (
+      descripcion === "Abono Editado (suma)" ||
+      descripcion === "abono cliente"
+    ) {
+      return "text-green-700";
+    } else {
+      return "text-red-600";
+    }
+  };
 
   return (
     <>
@@ -27,8 +38,20 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                 <td className="border border-black text-center px-2 py-1">
                   {index + 1}
                 </td>
-                <td className="border border-black text-center px-2 py-1">
-                  ${item.monto}
+                <td
+                  className={`border border-black text-center px-2 py-1 ${claseColores(
+                    item.descripcion
+                  )} `}
+                >
+                  <div className="items-center w-full h-full flex gap-2 mx-auto justify-center">
+                    {item.descripcion === "Abono Editado (suma)" ||
+                    item.descripcion === "abono cliente" ? (
+                      <ImArrowDown />
+                    ) : (
+                      <ImArrowUp />
+                    )}
+                    <span>${item.monto}</span>
+                  </div>
                 </td>
                 <td className="items-center whitespace-nowrap border-black flex justify-center px-1 py-1">
                   {formatDate(item.fecha)}
