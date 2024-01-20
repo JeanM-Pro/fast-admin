@@ -9,6 +9,7 @@ import { BiSolidLogOut } from "react-icons/bi";
 import { miContexto } from "../context/AppContext";
 import { FaMoneyCheckDollar } from "react-icons/fa6";
 import { FcStatistics } from "react-icons/fc";
+import { auth } from "../firebase/firebaseConfig";
 
 export const Navbar = () => {
   const [toggleNavbar, setToggleNavbar] = useState(false);
@@ -28,6 +29,18 @@ export const Navbar = () => {
   };
   const location = useLocation();
   const ruta = location.pathname;
+
+  const user = auth.currentUser;
+  let mostrar;
+  if (
+    user?.email === "jeancenteno54@fastadmin.com" ||
+    user?.email === "jeziel@fastadmin.com" ||
+    userData?.isAdmin === false
+  ) {
+    mostrar = false;
+  } else {
+    mostrar = true;
+  }
 
   return (
     <>
@@ -59,7 +72,7 @@ export const Navbar = () => {
                 </NavLink>
               </li>
 
-              {!userData?.isAdmin ? (
+              {mostrar ? (
                 <li>
                   <NavLink
                     className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
@@ -70,14 +83,17 @@ export const Navbar = () => {
                 </li>
               ) : null}
 
-              <li>
-                <NavLink
-                  className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
-                  to={"/estadisticas"}
-                >
-                  Estadisticas
-                </NavLink>
-              </li>
+              {mostrar ? (
+                <li>
+                  <NavLink
+                    className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
+                    to={"/estadisticas"}
+                  >
+                    Estadisticas
+                  </NavLink>
+                </li>
+              ) : null}
+
               <li>
                 <button
                   type="button"
@@ -115,7 +131,7 @@ export const Navbar = () => {
                 Inicio
               </NavLink>
 
-              {!userData?.isAdmin ? (
+              {mostrar ? (
                 <NavLink
                   to="/gastos-diarios"
                   className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
@@ -127,18 +143,20 @@ export const Navbar = () => {
                 </NavLink>
               ) : null}
 
-              <NavLink
-                to="/estadisticas"
-                className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
-                  ruta === "/estadisticas" ? "bg-[#8131bd] text-white" : ""
-                }`}
-              >
-                <FcStatistics
-                  className="mr-2 filter grayscale saturate-200"
-                  size={25}
-                />
-                Estadisticas
-              </NavLink>
+              {mostrar ? (
+                <NavLink
+                  to="/estadisticas"
+                  className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
+                    ruta === "/estadisticas" ? "bg-[#8131bd] text-white" : ""
+                  }`}
+                >
+                  <FcStatistics
+                    className="mr-2 filter grayscale saturate-200"
+                    size={25}
+                  />
+                  Estadisticas
+                </NavLink>
+              ) : null}
 
               <button
                 type="button"

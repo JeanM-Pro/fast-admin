@@ -124,7 +124,8 @@ export const HomePage = () => {
 
       <Navbar />
       <div className="w-full min-h-screen bg-gray-200 pt-16 px-4 md:px-8">
-        {user?.email === "jeancenteno54@fastadmin.com" && (
+        {user?.email === "jeancenteno54@fastadmin.com" ||
+        user?.email === "jeziel@fastadmin.com" ? (
           <button
             type="button"
             className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
@@ -132,7 +133,7 @@ export const HomePage = () => {
           >
             Crear Admn
           </button>
-        )}
+        ) : null}
 
         {userData?.isAdmin && (
           <>
@@ -238,14 +239,15 @@ export const HomePage = () => {
           </div>
         )}
 
-        {user?.email === "jeancenteno54@fastadmin.com" && (
+        {user?.email === "jeancenteno54@fastadmin.com" ||
+        user?.email === "jeziel@fastadmin.com" ? (
           <div className="w-full px-2 overflow-x-auto py-2">
             <Tabla
               datos={usersAdminData || []}
               setUsersAdminData={setUsersAdminData}
             />
           </div>
-        )}
+        ) : null}
 
         {userData?.isAdmin && (
           <div className="w-full px-2 overflow-x-auto py-2">

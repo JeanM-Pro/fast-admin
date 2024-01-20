@@ -38,6 +38,10 @@ export const RegisterPage = () => {
     setIsButtonPassword(!isButtonPassword);
   };
 
+  // Crear un nuevo objeto Date a partir de la fecha sumándole un mes
+  const proximoPago = new Date();
+  proximoPago.setMonth(proximoPago.getMonth() + 1);
+
   const handleRegister = async () => {
     setIsSubmiting(true);
     if (contrasena !== contrasenaVerify) {
@@ -65,6 +69,9 @@ export const RegisterPage = () => {
         isAdmin: true,
         nombre: nombre,
         cantidadRutas: rutas,
+        ultimoPago: new Date().toDateString(),
+        proximoPago: proximoPago.toDateString(),
+        activo: true,
       });
 
       const adminPassRef = collection(db, "adminPass");

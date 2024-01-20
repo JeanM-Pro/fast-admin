@@ -2,6 +2,7 @@ import { doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { IoIosClose } from "react-icons/io";
+import { MdOutlineNumbers } from "react-icons/md";
 import { MoonLoader } from "react-spinners";
 
 export const ModalEditAdmin = ({
@@ -12,6 +13,7 @@ export const ModalEditAdmin = ({
 }) => {
   const [email, setEmail] = useState(selectedAdmin.email);
   const [nombre, setNombre] = useState(selectedAdmin.nombre);
+  const [rutas, setRutas] = useState(selectedAdmin.cantidadRutas);
   const [isEditing, setIsEditing] = useState(false);
 
   const editarAdmin = async () => {
@@ -25,6 +27,7 @@ export const ModalEditAdmin = ({
       ...adminData,
       email: email,
       nombre: nombre,
+      cantidadRutas: rutas,
     });
 
     const updateAdminsData = datos.map((admin) =>
@@ -49,7 +52,7 @@ export const ModalEditAdmin = ({
           <h2 className="text-center text-xl font-semibold">
             Editar Administrador
           </h2>
-          <div className="w-full flex flex-col gap-6 items-center">
+          <div className="w-full flex flex-col gap-2 mt-2 items-center">
             <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
               <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
                 <AiOutlineUser size={24} />
@@ -73,6 +76,20 @@ export const ModalEditAdmin = ({
                 placeholder="Nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
+              />
+            </div>
+
+            <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
+              <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+                <MdOutlineNumbers size={24} />
+              </div>
+              <input
+                type="number"
+                className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
+                placeholder="Numero de Rutas"
+                value={rutas}
+                onChange={(e) => setRutas(e.target.value)}
+                required
               />
             </div>
 
