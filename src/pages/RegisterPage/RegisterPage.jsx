@@ -20,7 +20,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-export const RegisterPage = ({ setUser }) => {
+export const RegisterPage = () => {
   const [usuario, setUsuario] = useState("");
   const [nombre, setNombre] = useState("");
   const [contrasena, setContrasena] = useState("");

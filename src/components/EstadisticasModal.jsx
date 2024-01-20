@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { miContexto } from "../context/AppContext";
 import { TablaMovimientosModal } from "../pages/Estadisticas/components/TablaMovimientosModal";
@@ -9,8 +9,39 @@ export const EstadisticasModal = ({
   selectedRuta,
   clientes,
 }) => {
-  const { formatDate } = useContext(miContexto);
+  const { formatDate, formatDate2 } = useContext(miContexto);
   const [mostrarMovimientos, setMostrarMovimientos] = useState(false);
+  const [gastosHoy, setGastosHoy] = useState(0);
+
+  useEffect(() => {
+    if (selectedRuta && selectedRuta.historialGastos) {
+      // Obtener la fecha actual
+      const fechaHoy = formatDate2(new Date());
+
+      // Iterar sobre el historial de gastos y sumar los gastos de hoy
+      const gastosHoyTotal = selectedRuta.historialGastos.reduce(
+        (total, gasto) => {
+          const gastoFecha = formatDate2(gasto.fecha);
+
+          // Verificar si el gasto es de hoy
+          if (esMismoDia(gastoFecha, fechaHoy)) {
+            return total + gasto.valor;
+          } else {
+            return total;
+          }
+        },
+        0
+      );
+
+      // Actualizar el estado con la suma de los gastos de hoy
+      setGastosHoy(gastosHoyTotal);
+    }
+  }, [formatDate2, selectedRuta, selectedRuta?.historialGastos]);
+
+  // Función para verificar si dos fechas son del mismo día
+  const esMismoDia = (fecha1, fecha2) => {
+    return fecha1 === fecha2 && fecha1 === fecha2 && fecha1 === fecha2;
+  };
 
   const compararFechas = (a, b) => {
     const fechaA = new Date(a.fecha.seconds * 1000 + a.fecha.nanoseconds / 1e6);
@@ -123,6 +154,9 @@ export const EstadisticasModal = ({
             <p>
               Prestamos del dia:{" "}
               <span className="font-bold">${prestamoDelDia}</span>
+            </p>
+            <p>
+              Gastos del dia: <span className="font-bold">${gastosHoy}</span>
             </p>
           </div>
           <button

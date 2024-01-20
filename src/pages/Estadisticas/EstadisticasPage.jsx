@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Navbar } from "../../components/NavBar";
 import { miContexto } from "../../context/AppContext";
 import { TablaMovimientosModal } from "./components/TablaMovimientosModal";
@@ -11,6 +11,38 @@ export const EstadisticasPage = () => {
   const [mostrarMovimientos, setMostrarMovimientos] = useState(false);
   const [verCambiarContrasenaModal, setverCambiarContrasenaModal] =
     useState(false);
+  const [gastosHoy, setGastosHoy] = useState(0);
+  const { formatDate2 } = useContext(miContexto);
+
+  useEffect(() => {
+    if (usuarioRuta && usuarioRuta.historialGastos) {
+      // Obtener la fecha actual
+      const fechaHoy = formatDate2(new Date());
+
+      // Iterar sobre el historial de gastos y sumar los gastos de hoy
+      const gastosHoyTotal = usuarioRuta.historialGastos.reduce(
+        (total, gasto) => {
+          const gastoFecha = formatDate2(gasto.fecha);
+
+          // Verificar si el gasto es de hoy
+          if (esMismoDia(gastoFecha, fechaHoy)) {
+            return total + gasto.valor;
+          } else {
+            return total;
+          }
+        },
+        0
+      );
+
+      // Actualizar el estado con la suma de los gastos de hoy
+      setGastosHoy(gastosHoyTotal);
+    }
+  }, [formatDate2, usuarioRuta, usuarioRuta?.historialGastos]);
+
+  // Función para verificar si dos fechas son del mismo día
+  const esMismoDia = (fecha1, fecha2) => {
+    return fecha1 === fecha2 && fecha1 === fecha2 && fecha1 === fecha2;
+  };
 
   const saldoRutas = rutasData?.reduce(
     (total, ruta) => total + ruta.saldoInicial,
@@ -184,6 +216,9 @@ export const EstadisticasPage = () => {
               <p>
                 Prestamos del dia:{" "}
                 <span className="font-bold">${prestamoDelDia}</span>
+              </p>
+              <p>
+                Gastos del dia: <span className="font-bold">${gastosHoy}</span>
               </p>
               <button
                 type="button"
