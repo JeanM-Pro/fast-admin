@@ -84,7 +84,7 @@ export const TablaAdministradores = () => {
                   {item.responsable}
                 </td>
                 <td className="border border-black px-2 whitespace-nowrap text-center py-1 uppercase font-semibold">
-                  ${item.saldoInicial}
+                  ${parseInt(item.saldoInicial)}
                 </td>
 
                 <td className="border border-black w-10 text-center px-2 py-1 font-semibold">

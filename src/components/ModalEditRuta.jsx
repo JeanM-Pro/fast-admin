@@ -8,7 +8,9 @@ import { MoonLoader } from "react-spinners";
 
 export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
   const [responsable, setResponsable] = useState(selectedRuta.responsable);
-  const [saldoInicial, setSaldoInicial] = useState(selectedRuta.saldoInicial);
+  const [saldoInicial, setSaldoInicial] = useState(
+    parseInt(selectedRuta.saldoInicial)
+  );
   const [isEditing, setIsEditing] = useState(false);
   const { rutasData, setRutasData, userData } = useContext(miContexto);
 
@@ -30,10 +32,10 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
     let motivo;
 
     if (rutaData.saldoInicial > saldoInicial) {
-      nuevoMonto = rutaData.saldoInicial - saldoInicial;
+      nuevoMonto = parseInt(rutaData.saldoInicial) - saldoInicial;
       motivo = "Retiro";
     } else {
-      nuevoMonto = saldoInicial - rutaData.saldoInicial;
+      nuevoMonto = saldoInicial - parseInt(rutaData.saldoInicial);
       motivo = "Ingreso";
     }
 
@@ -101,7 +103,7 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
                 className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
                 placeholder="Saldo Nuevo"
                 value={saldoInicial}
-                onChange={(e) => setSaldoInicial(e.target.value)}
+                onChange={(e) => setSaldoInicial(parseInt(e.target.value))}
                 required
               />
             </div>

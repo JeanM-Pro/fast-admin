@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   AiOutlineEye,
   AiOutlineEyeInvisible,
   AiOutlineUser,
 } from "react-icons/ai";
+import { MdOutlineNumbers } from "react-icons/md";
 import { TbLock } from "react-icons/tb";
 import { MoonLoader } from "react-spinners";
 import fondoImagen from "../../images/fondo.png";
@@ -19,6 +20,7 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { miContexto } from "../../context/AppContext";
 
 export const RegisterPage = () => {
   const [usuario, setUsuario] = useState("");
@@ -27,6 +29,8 @@ export const RegisterPage = () => {
   const [contrasenaVerify, setContrasenaVerify] = useState("");
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [isButtonPassword, setIsButtonPassword] = useState(true);
+  const [rutas, setRutas] = useState(1);
+  const { handleLogout } = useContext(miContexto);
 
   const navigate = useNavigate();
 
@@ -60,6 +64,7 @@ export const RegisterPage = () => {
         email: createdUser.email,
         isAdmin: true,
         nombre: nombre,
+        cantidadRutas: rutas,
       });
 
       const adminPassRef = collection(db, "adminPass");
@@ -75,6 +80,7 @@ export const RegisterPage = () => {
       setIsSubmiting(false);
       navigate("/home");
       toast.success("Admin creado con exito");
+      handleLogout();
     } catch (error) {
       console.log(error);
       if (error.code === "auth/email-already-in-use") {
@@ -108,7 +114,7 @@ export const RegisterPage = () => {
 
         <h2 className="text-2xl mb-4">Registro de Administradores</h2>
 
-        <div className="w-full flex flex-col gap-6 items-center">
+        <div className="w-full flex flex-col gap-2 items-center">
           <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
             <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
               <AiOutlineUser size={24} />
@@ -118,6 +124,7 @@ export const RegisterPage = () => {
               className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
               placeholder="Usuario"
               onChange={(e) => setUsuario(e.target.value)}
+              required
             />
           </div>
 
@@ -130,6 +137,21 @@ export const RegisterPage = () => {
               className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
               placeholder="Nombre"
               onChange={(e) => setNombre(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
+            <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+              <MdOutlineNumbers size={24} />
+            </div>
+            <input
+              type="number"
+              className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
+              placeholder="Numero de Rutas"
+              value={rutas}
+              onChange={(e) => setRutas(e.target.value)}
+              required
             />
           </div>
 
@@ -142,6 +164,7 @@ export const RegisterPage = () => {
               className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
               placeholder="Contraseña"
               onChange={(e) => setContrasena(e.target.value)}
+              required
             />
             <div className="h-full w-[40px] bg-white rounded-md flex items-center justify-center ">
               {isButtonPassword ? (
@@ -168,6 +191,7 @@ export const RegisterPage = () => {
               className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
               placeholder="Verificar Contraseña"
               onChange={(e) => setContrasenaVerify(e.target.value)}
+              required
             />
             <div className="h-full w-[40px] bg-white rounded-md flex items-center justify-center ">
               {isButtonPassword ? (

@@ -12,6 +12,7 @@ import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import { CrearClienteModalNew } from "./Components/Modals/CrearClientesModal/CrearClienteModalNew";
 import { CrearClienteExistenteModal } from "../../components/CrearClienteExistenteModal";
 import { actualizarCuotas } from "./actualizarCuotas";
+import { ModalRutasNoDisponibles } from "../../components/ModalRutasNoDisponibles";
 
 export const HomePage = () => {
   const [isModalCreateRuta, setIsModalCreateRuta] = useState(false);
@@ -21,6 +22,8 @@ export const HomePage = () => {
   const [isModalCreateClienteExistente, setIsModalCreateClienteExistente] =
     useState(false);
   const [primerRender, setPrimerRender] = useState(true);
+  const [isModalRutasNoDisponibles, setIsModalRutasNoDisponibles] =
+    useState(false);
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -31,8 +34,17 @@ export const HomePage = () => {
     infoClientes,
     setInfoClientes,
     setUsersAdminData,
+    rutasData,
   } = useContext(miContexto);
   const db = getFirestore();
+  const adminData = usersAdminData?.filter((adm) => adm.uid === user?.uid);
+  let adminInfo;
+
+  if (adminData) {
+    adminInfo = adminData[0];
+  }
+
+  let rutasDisponibles = parseInt(adminInfo?.cantidadRutas) - rutasData?.length;
 
   const handleActualizarCuotas = async () => {
     const clientesActualizados = await actualizarCuotas({
@@ -63,10 +75,27 @@ export const HomePage = () => {
     sumaPagosDiarios += infoClientes[i].pagoDiario;
   }
 
+  const handleCrearRuta = () => {
+    if (rutasDisponibles === 0) {
+      setIsModalRutasNoDisponibles(true);
+    } else {
+      setIsModalCreateRuta(true);
+    }
+  };
+
   return (
     <>
+      {isModalRutasNoDisponibles ? (
+        <ModalRutasNoDisponibles
+          setIsModalRutasNoDisponibles={setIsModalRutasNoDisponibles}
+        />
+      ) : null}
+
       {isModalCreateRuta ? (
-        <RegisterRutaPage setIsModalCreateRuta={setIsModalCreateRuta} />
+        <RegisterRutaPage
+          setIsModalCreateRuta={setIsModalCreateRuta}
+          adminInfo={adminInfo}
+        />
       ) : null}
 
       {isModalCreateCliente ? (
@@ -106,13 +135,24 @@ export const HomePage = () => {
         )}
 
         {userData?.isAdmin && (
-          <button
-            type="button"
-            className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-            onClick={() => setIsModalCreateRuta(true)}
-          >
-            Crear Ruta
-          </button>
+          <>
+            <button
+              type="button"
+              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+              onClick={handleCrearRuta}
+            >
+              Crear Ruta
+            </button>
+
+            <p className="flex font-semibold">
+              Rutas disponibles:
+              <span className="ml-1">{`${
+                rutasDisponibles ? rutasDisponibles : "0"
+              }/${
+                adminInfo?.cantidadRutas ? adminInfo?.cantidadRutas : "0"
+              }`}</span>
+            </p>
+          </>
         )}
 
         {usuarioRuta && (

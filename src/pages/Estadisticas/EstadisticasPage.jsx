@@ -45,7 +45,7 @@ export const EstadisticasPage = () => {
   };
 
   const saldoRutas = rutasData?.reduce(
-    (total, ruta) => total + ruta.saldoInicial,
+    (total, ruta) => total + parseInt(ruta.saldoInicial),
     0
   );
 

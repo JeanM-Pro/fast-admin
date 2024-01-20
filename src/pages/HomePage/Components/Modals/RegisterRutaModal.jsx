@@ -21,7 +21,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { miContexto } from "../../../../context/AppContext";
 
-export const RegisterRutaPage = ({ setIsModalCreateRuta }) => {
+export const RegisterRutaPage = ({ setIsModalCreateRuta, adminInfo }) => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [contrasenaVerify, setContrasenaVerify] = useState("");
