@@ -35,6 +35,7 @@ export const HomePage = () => {
     setInfoClientes,
     setUsersAdminData,
     rutasData,
+    formatDate2,
   } = useContext(miContexto);
   const db = getFirestore();
   const adminData = usersAdminData?.filter((adm) => adm.uid === user?.uid);
@@ -137,14 +138,6 @@ export const HomePage = () => {
 
         {userData?.isAdmin && (
           <>
-            <button
-              type="button"
-              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-              onClick={handleCrearRuta}
-            >
-              Crear Ruta
-            </button>
-
             <p className="flex font-semibold">
               Rutas disponibles:
               <span className="ml-1">{`${
@@ -153,6 +146,25 @@ export const HomePage = () => {
                 adminInfo?.cantidadRutas ? adminInfo?.cantidadRutas : "0"
               }`}</span>
             </p>
+            <p className="flex font-semibold">
+              Ultimo pago:
+              <span className="ml-1">{`${
+                userData.ultimoPago ? formatDate2(userData.ultimoPago) : ""
+              }`}</span>
+            </p>
+            <p className="flex font-semibold">
+              Proximo pago:
+              <span className="ml-1">{`${
+                userData.ultimoPago ? formatDate2(userData.proximoPago) : ""
+              }`}</span>
+            </p>
+            <button
+              type="button"
+              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+              onClick={handleCrearRuta}
+            >
+              Crear Ruta
+            </button>
           </>
         )}
 
