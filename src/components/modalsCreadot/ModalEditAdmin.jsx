@@ -31,7 +31,9 @@ export const ModalEditAdmin = ({
     });
 
     const updateAdminsData = datos.map((admin) =>
-      admin.uid === selectedAdmin.uid ? { ...admin, email, nombre } : admin
+      admin.uid === selectedAdmin.uid
+        ? { ...admin, email, nombre, cantidadRutas: rutas }
+        : admin
     );
 
     setUsersAdminData(updateAdminsData);

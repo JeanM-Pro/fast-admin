@@ -69,8 +69,8 @@ export const RegisterPage = () => {
         isAdmin: true,
         nombre: nombre,
         cantidadRutas: rutas,
-        ultimoPago: new Date().toDateString(),
-        proximoPago: proximoPago.toDateString(),
+        ultimoPago: new Date(),
+        proximoPago: proximoPago,
         activo: true,
       });
 
