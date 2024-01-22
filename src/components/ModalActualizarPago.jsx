@@ -1,4 +1,12 @@
-import { doc, getDoc, getFirestore, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import React, { useContext, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { MoonLoader } from "react-spinners";
@@ -27,6 +35,7 @@ export const ModalActualizarPago = ({ setIsActualizarPago, selectedAdmin }) => {
         ultimoPago: new Date(),
         proximoPago: proximoPago,
       });
+
       setUsersAdminData((prevAdmin) =>
         prevAdmin.map((admin) =>
           admin.uid === adminData.uid
@@ -35,11 +44,34 @@ export const ModalActualizarPago = ({ setIsActualizarPago, selectedAdmin }) => {
         )
       );
 
+      // Actualizar cada ruta del administrador
+
+      const querySnapshot = await getDocs(
+        collection(db, "admin_users", selectedAdmin.uid, "rutas")
+      );
+      const rutasData = querySnapshot.docs.map((doc) => doc.data());
+
+      const batch = writeBatch(db);
+
+      rutasData.forEach((rutaDoc) => {
+        const rutaRef = doc(
+          db,
+          "admin_users",
+          selectedAdmin.uid,
+          "rutas",
+          rutaDoc.uid
+        );
+        batch.update(rutaRef, { proximoPago: proximoPago });
+      });
+
+      await batch.commit();
+
       toast.success("Pago Actualizado");
       setIsActualizarPago(false);
       setIsEditing(false);
     } catch (error) {
       console.log("Error al actualizar pago", error);
+      setIsEditing(false);
     }
   };
   return (

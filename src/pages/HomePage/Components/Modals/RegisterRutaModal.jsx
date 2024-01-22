@@ -21,7 +21,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import { miContexto } from "../../../../context/AppContext";
 
-export const RegisterRutaPage = ({ setIsModalCreateRuta, adminInfo }) => {
+export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [contrasenaVerify, setContrasenaVerify] = useState("");
@@ -76,6 +76,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, adminInfo }) => {
           historialGastos: [],
           movimientos: [],
           historialSaldos: [saldoInicialHistorial],
+          proximoPago: userData.proximoPago,
         });
 
         setRutasData([
@@ -90,6 +91,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, adminInfo }) => {
             historialGastos: [],
             movimientos: [],
             historialSaldos: [saldoInicialHistorial],
+            proximoPago: userData.proximoPago,
           },
         ]);
 

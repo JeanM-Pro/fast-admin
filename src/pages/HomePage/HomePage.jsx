@@ -8,11 +8,13 @@ import { RegisterRutaPage } from "./Components/Modals/RegisterRutaModal";
 import { TablaAdministradores } from "../../components/TablaAdministradores";
 import { CrearClienteModal } from "../../components/CrearClienteModal";
 import { TablaClientes } from "../../components/TablaClientes";
-import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, getFirestore, updateDoc } from "firebase/firestore";
 import { CrearClienteModalNew } from "./Components/Modals/CrearClientesModal/CrearClienteModalNew";
 import { CrearClienteExistenteModal } from "../../components/CrearClienteExistenteModal";
 import { actualizarCuotas } from "./actualizarCuotas";
 import { ModalRutasNoDisponibles } from "../../components/ModalRutasNoDisponibles";
+import { ModalAvisoPago } from "../../components/ModalAvisoPago";
+import { ModalAvisoBloqueo } from "../../components/ModalAvisoBloqueo";
 
 export const HomePage = () => {
   const [isModalCreateRuta, setIsModalCreateRuta] = useState(false);
@@ -24,6 +26,8 @@ export const HomePage = () => {
   const [primerRender, setPrimerRender] = useState(true);
   const [isModalRutasNoDisponibles, setIsModalRutasNoDisponibles] =
     useState(false);
+  const [isAvisoPago, setIsAvisoPago] = useState(false);
+  const [isLockedAcount, setIsLockedAcount] = useState(false);
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -36,16 +40,11 @@ export const HomePage = () => {
     setUsersAdminData,
     rutasData,
     formatDate2,
+    setRutasData,
   } = useContext(miContexto);
   const db = getFirestore();
-  const adminData = usersAdminData?.filter((adm) => adm.uid === user?.uid);
-  let adminInfo;
 
-  if (adminData) {
-    adminInfo = adminData[0];
-  }
-
-  let rutasDisponibles = parseInt(adminInfo?.cantidadRutas) - rutasData?.length;
+  let rutasDisponibles = parseInt(userData?.cantidadRutas) - rutasData?.length;
 
   const handleActualizarCuotas = async () => {
     const clientesActualizados = await actualizarCuotas({
@@ -84,6 +83,112 @@ export const HomePage = () => {
     }
   };
 
+  useEffect(() => {
+    if (userData) {
+      const fechaMillis = userData.proximoPago.toMillis(); // Convertir a milisegundos
+      const fechaProximoPago = userData.proximoPago;
+      const proximoPago = formatDate2(fechaProximoPago);
+
+      // Obtener la fecha de hoy en formato Date
+      const fechaHoy = new Date();
+
+      // Calcular la diferencia en milisegundos
+      const diferenciaEnMillis = fechaHoy - fechaMillis;
+
+      // Convertir la diferencia a días
+      const diferenciaEnDias = Math.floor(
+        diferenciaEnMillis / (1000 * 60 * 60 * 24)
+      );
+
+      if (
+        proximoPago === formatDate2(fechaHoy) ||
+        (diferenciaEnDias > 0 && diferenciaEnDias <= 2)
+      ) {
+        setIsAvisoPago(true);
+      } else if (diferenciaEnDias >= 3) {
+        setIsLockedAcount(true);
+        setRutasData(null);
+      }
+    }
+  }, [userData, formatDate2, setRutasData]);
+
+  useEffect(() => {
+    if (usuarioRuta) {
+      const fechaMillis = usuarioRuta.proximoPago.toMillis(); // Convertir a milisegundos
+      const fechaProximoPago = usuarioRuta.proximoPago;
+      const proximoPago = formatDate2(fechaProximoPago);
+
+      // Obtener la fecha de hoy en formato Date
+      const fechaHoy = new Date();
+
+      // Calcular la diferencia en milisegundos
+      const diferenciaEnMillis = fechaHoy - fechaMillis;
+
+      // Convertir la diferencia a días
+      const diferenciaEnDias = Math.floor(
+        diferenciaEnMillis / (1000 * 60 * 60 * 24)
+      );
+
+      if (
+        proximoPago === formatDate2(fechaHoy) ||
+        (diferenciaEnDias > 0 && diferenciaEnDias <= 2)
+      ) {
+        setIsAvisoPago(true);
+      } else if (diferenciaEnDias >= 3) {
+        setIsLockedAcount(true);
+        setInfoClientes(null);
+      }
+    }
+  }, [usuarioRuta, formatDate2, setInfoClientes]);
+
+  useEffect(() => {
+    const eliminarClientesPagados = async () => {
+      if (infoClientes) {
+        const fechaHoy = new Date();
+
+        infoClientes.forEach(async (cliente) => {
+          if (cliente.historialPagos) {
+            const eliminarCliente =
+              cliente.cuotasPactadas === cliente.cuotasPagadas &&
+              cliente.historialPagos.some((pago) => {
+                const fechaPago = pago.fecha.toDate();
+                const fechaPagoMasUnDia = new Date(
+                  fechaPago.getTime() + 24 * 60 * 60 * 1000
+                ); // Añadir un día
+
+                return (
+                  fechaPagoMasUnDia.getDate() === fechaHoy.getDate() &&
+                  fechaPagoMasUnDia.getMonth() === fechaHoy.getMonth() &&
+                  fechaPagoMasUnDia.getFullYear() === fechaHoy.getFullYear()
+                );
+              });
+
+            if (eliminarCliente) {
+              const clienteRef = doc(
+                db,
+                "admin_users",
+                usuarioRuta.adminUid,
+                "rutas",
+                usuarioRuta.uid,
+                "clientes",
+                cliente.uid
+              );
+
+              try {
+                await deleteDoc(clienteRef);
+              } catch (error) {
+                console.error("Error al eliminar cliente", error);
+              }
+            }
+          }
+        });
+      }
+    };
+
+    eliminarClientesPagados();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [infoClientes]);
+
   return (
     <>
       {isModalRutasNoDisponibles ? (
@@ -92,10 +197,22 @@ export const HomePage = () => {
         />
       ) : null}
 
+      {isLockedAcount ? (
+        <ModalAvisoBloqueo usuarioRuta={usuarioRuta} userData={userData} />
+      ) : null}
+
+      {isAvisoPago ? (
+        <ModalAvisoPago
+          setIsAvisoPago={setIsAvisoPago}
+          userData={userData}
+          usuarioRuta={usuarioRuta}
+        />
+      ) : null}
+
       {isModalCreateRuta ? (
         <RegisterRutaPage
           setIsModalCreateRuta={setIsModalCreateRuta}
-          adminInfo={adminInfo}
+          userData={userData}
         />
       ) : null}
 
@@ -143,7 +260,7 @@ export const HomePage = () => {
               <span className="ml-1">{`${
                 rutasDisponibles ? rutasDisponibles : "0"
               }/${
-                adminInfo?.cantidadRutas ? adminInfo?.cantidadRutas : "0"
+                userData?.cantidadRutas ? userData?.cantidadRutas : "0"
               }`}</span>
             </p>
             <p className="flex font-semibold">

@@ -4,6 +4,7 @@ import { AiOutlineUser } from "react-icons/ai";
 import { IoIosClose } from "react-icons/io";
 import { MdOutlineNumbers } from "react-icons/md";
 import { MoonLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
 export const ModalEditAdmin = ({
   setModalEdit,
@@ -18,27 +19,32 @@ export const ModalEditAdmin = ({
 
   const editarAdmin = async () => {
     setIsEditing(true);
-    const db = getFirestore();
-    const adminRef = doc(db, "admin_users", selectedAdmin.uid);
-    const adminSnapshot = await getDoc(adminRef);
-    const adminData = adminSnapshot.data();
+    try {
+      const db = getFirestore();
+      const adminRef = doc(db, "admin_users", selectedAdmin.uid);
+      const adminSnapshot = await getDoc(adminRef);
+      const adminData = adminSnapshot.data();
 
-    await updateDoc(adminRef, {
-      ...adminData,
-      email: email,
-      nombre: nombre,
-      cantidadRutas: rutas,
-    });
+      await updateDoc(adminRef, {
+        ...adminData,
+        email: email,
+        nombre: nombre,
+        cantidadRutas: rutas,
+      });
 
-    const updateAdminsData = datos.map((admin) =>
-      admin.uid === selectedAdmin.uid
-        ? { ...admin, email, nombre, cantidadRutas: rutas }
-        : admin
-    );
+      const updateAdminsData = datos.map((admin) =>
+        admin.uid === selectedAdmin.uid
+          ? { ...admin, email, nombre, cantidadRutas: rutas }
+          : admin
+      );
 
-    setUsersAdminData(updateAdminsData);
-    setModalEdit(false);
-    setIsEditing(false);
+      setUsersAdminData(updateAdminsData);
+      setModalEdit(false);
+      setIsEditing(false);
+      toast.success("Admin editado con exito");
+    } catch (error) {
+      console.log("Error al editar admin", error);
+    }
   };
 
   return (
