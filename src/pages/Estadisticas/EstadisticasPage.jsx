@@ -49,45 +49,18 @@ export const EstadisticasPage = () => {
     0
   );
 
-  const ultimoSaldo = rutasData?.reduce((total, ruta) => {
-    // Verifica si hay algún historial de saldos
-    if (ruta.historialSaldos && ruta.historialSaldos.length > 0) {
-      // Ordena el historial de saldos por fecha de forma descendente
-      const historialOrdenado = ruta.historialSaldos.sort(
-        (a, b) => new Date(b.fecha) - new Date(a.fecha)
-      );
-
-      // Toma el saldo más reciente
-      const saldoMasReciente = historialOrdenado[0].saldo;
-
-      // Suma el saldo más reciente al total
-      return total + parseFloat(saldoMasReciente); // Convierte a número
-    }
-
-    // Si no hay historial de saldos, retorna el total sin cambios
-    return total;
-  }, 0);
+  const ultimoSaldo = rutasData?.reduce(
+    (total, ruta) => total + parseInt(ruta.historialSaldos),
+    0
+  );
 
   const gananciasRutas = saldoRutas - ultimoSaldo;
 
-  const compararFechas = (a, b) => {
-    const fechaA = new Date(a.fecha.seconds * 1000 + a.fecha.nanoseconds / 1e6);
-    const fechaB = new Date(b.fecha.seconds * 1000 + b.fecha.nanoseconds / 1e6);
-    return fechaB - fechaA;
-  };
-
-  usuarioRuta?.historialSaldos.sort(compararFechas);
-  const saldoMasNuevo =
-    usuarioRuta?.historialSaldos.length > 0
-      ? usuarioRuta.historialSaldos[0].saldo
-      : null;
-  const fechaDeSaldoMasNuevo =
-    usuarioRuta?.historialSaldos.length > 0
-      ? usuarioRuta?.historialSaldos[0].fecha
-      : null;
+  const saldoMasNuevo = parseFloat(usuarioRuta?.historialSaldos) || null;
 
   const ganancias =
-    parseInt(usuarioRuta?.saldoInicial) - parseInt(saldoMasNuevo);
+    parseInt(usuarioRuta?.saldoInicial) -
+    parseInt(usuarioRuta?.historialSaldos);
 
   const calcularTotalAbonos = () => {
     // infoClientes es el array de clientes que contiene la propiedad 'abono'
@@ -165,10 +138,6 @@ export const EstadisticasPage = () => {
             {userData ? "Total saldo invertido: " : "Ultimo saldo ingresado: "}
             <span className="font-bold">
               ${saldoMasNuevo ? saldoMasNuevo : ultimoSaldo}
-            </span>
-            {saldoMasNuevo ? " - " : null}
-            <span className="font-semibold text-sm">
-              {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
             </span>
           </p>
 

@@ -43,21 +43,7 @@ export const EstadisticasModal = ({
     return fecha1 === fecha2 && fecha1 === fecha2 && fecha1 === fecha2;
   };
 
-  const compararFechas = (a, b) => {
-    const fechaA = new Date(a.fecha.seconds * 1000 + a.fecha.nanoseconds / 1e6);
-    const fechaB = new Date(b.fecha.seconds * 1000 + b.fecha.nanoseconds / 1e6);
-    return fechaB - fechaA;
-  };
-
-  selectedRuta?.historialSaldos.sort(compararFechas);
-  const saldoMasNuevo =
-    selectedRuta?.historialSaldos.length > 0
-      ? selectedRuta.historialSaldos[0].saldo
-      : null;
-  const fechaDeSaldoMasNuevo =
-    selectedRuta?.historialSaldos.length > 0
-      ? selectedRuta?.historialSaldos[0].fecha
-      : null;
+  const saldoMasNuevo = parseFloat(selectedRuta?.historialSaldos) || null;
 
   const ganancias =
     parseInt(selectedRuta?.saldoInicial) - parseInt(saldoMasNuevo);
@@ -129,10 +115,6 @@ export const EstadisticasModal = ({
               Ultimo saldo ingresado:{" "}
               <span className="font-bold">
                 ${saldoMasNuevo ? saldoMasNuevo : ""}
-              </span>{" "}
-              -{" "}
-              <span className="font-semibold text-sm">
-                {fechaDeSaldoMasNuevo ? formatDate(fechaDeSaldoMasNuevo) : null}
               </span>
             </p>
 

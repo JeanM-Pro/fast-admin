@@ -56,11 +56,6 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
       // Obtener el UID del nuevo usuario
       const uid = newUser?.uid;
 
-      const saldoInicialHistorial = {
-        saldo: saldoInicial,
-        fecha: new Date(),
-      };
-
       if (uid) {
         // Guardar información en Firestore
         const db = getFirestore();
@@ -75,7 +70,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
           saldoInicial: saldoInicial,
           historialGastos: [],
           movimientos: [],
-          historialSaldos: [saldoInicialHistorial],
+          historialSaldos: saldoInicial,
           proximoPago: userData.proximoPago,
         });
 
@@ -90,7 +85,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
             saldoInicial: saldoInicial,
             historialGastos: [],
             movimientos: [],
-            historialSaldos: [saldoInicialHistorial],
+            historialSaldos: saldoInicial,
             proximoPago: userData.proximoPago,
           },
         ]);
@@ -175,7 +170,7 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
                   type="number"
                   className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
                   placeholder="Saldo Inicial"
-                  onChange={(e) => setSaldoInicial(e.target.value)}
+                  onChange={(e) => setSaldoInicial(parseInt(e.target.value))}
                   required
                 />
               </div>

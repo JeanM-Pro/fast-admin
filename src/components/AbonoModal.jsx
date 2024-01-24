@@ -93,10 +93,10 @@ export const AbonoModal = ({
       }
 
       // Calcular cuotas a restar, asegurándote de que no sea un número negativo
-      const cuotasAtrasadasToSubtract = Math.max(
-        0,
-        selectedAbono.cuotasAtrasadas - vecesSuperado
-      );
+      const cuotasAtrasadasToSubtract =
+        vecesSuperado >= 2
+          ? selectedAbono.cuotasAtrasadas - (vecesSuperado - 1)
+          : Math.max(0, selectedAbono.cuotasAtrasadas - vecesSuperado);
 
       // Restar prestamo al saldo disponible en firebase
 
@@ -216,6 +216,7 @@ export const AbonoModal = ({
         cuotasAtrasadas: cuotasAtrasadasToSubtract,
         historialPagos: historialPagosActualizado,
       });
+
       setSelectedAbono({
         ...selectedAbono,
         abono: abono,

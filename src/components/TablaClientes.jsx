@@ -346,6 +346,14 @@ export const TablaClientes = ({
                     fechaActualEnMilisegundos
                       ? "bg-red-500"
                       : null
+                  } ${
+                    item.formaDePago === "semanal"
+                      ? "bg-orange-950 text-white"
+                      : null
+                  } ${
+                    item.formaDePago === "mensual"
+                      ? "bg-blue-700 text-white"
+                      : null
                   }`}
                 >
                   {index + 1}

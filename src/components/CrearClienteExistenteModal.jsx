@@ -159,21 +159,84 @@ export const CrearClienteExistenteModal = ({
       let fechaFinal = new Date(fechaInicial);
 
       for (let i = 0; i < cuotasPactadasNum; i++) {
-        // Añadir un día
-        fechaFinal.setDate(fechaFinal.getDate() + 1);
-
-        // Si es domingo, agregar un día extra
-        if (fechaFinal.getDay() === 0) {
+        if (datosCliente.formaDePago === "diario") {
           fechaFinal.setDate(fechaFinal.getDate() + 1);
+
+          // Omitir los domingos
+          if (fechaFinal.getDay() === 0) {
+            fechaFinal.setDate(fechaFinal.getDate() + 1);
+          }
+        } else if (datosCliente.formaDePago === "semanal") {
+          fechaFinal.setDate(fechaFinal.getDate() + 7);
+
+          // Omitir los domingos
+          if (fechaFinal.getDay() === 0) {
+            fechaFinal.setDate(fechaFinal.getDate() + 1);
+          }
+        } else if (datosCliente.formaDePago === "mensual") {
+          fechaFinal.setDate(fechaFinal.getDate() + 30);
+
+          // Omitir los domingos
+          if (fechaFinal.getDay() === 0) {
+            fechaFinal.setDate(fechaFinal.getDate() + 1);
+          }
         }
       }
 
       // Formatear la fecha
       const fechaFinalFormateada = format(fechaFinal, "dd/MM/yyyy");
+
       return {
         ...prevDatosCliente,
         cuotasPactadas: cuotasPactadasNum,
         pagoDiario: valorTotal / cuotasPactadasNum,
+        fechaFinal: fechaFinalFormateada,
+      };
+    });
+  };
+
+  const handleFormaDePagoChange = (e) => {
+    const formaDepago = e.target.value;
+    setDatosCliente((prevDatosCliente) => {
+      // Calcular la fecha final excluyendo los domingos
+      const fechaInicial = new Date();
+      let fechaFinal = new Date(fechaInicial);
+
+      const cuotasPactadasNum = datosCliente.cuotasPactadas
+        ? datosCliente.cuotasPactadas
+        : 0;
+
+      for (let i = 0; i < cuotasPactadasNum; i++) {
+        if (formaDepago === "diario") {
+          fechaFinal.setDate(fechaFinal.getDate() + 1);
+
+          // Omitir los domingos
+          if (fechaFinal.getDay() === 0) {
+            fechaFinal.setDate(fechaFinal.getDate() + 1);
+          }
+        } else if (formaDepago === "semanal") {
+          fechaFinal.setDate(fechaFinal.getDate() + 7);
+
+          // Omitir los domingos
+          if (fechaFinal.getDay() === 0) {
+            fechaFinal.setDate(fechaFinal.getDate() + 1);
+          }
+        } else if (formaDepago === "mensual") {
+          fechaFinal.setDate(fechaFinal.getDate() + 30);
+
+          // Omitir los domingos
+          if (fechaFinal.getDay() === 0) {
+            fechaFinal.setDate(fechaFinal.getDate() + 1);
+          }
+        }
+      }
+
+      // Formatear la fecha
+      const fechaFinalFormateada = format(fechaFinal, "dd/MM/yyyy");
+
+      return {
+        ...prevDatosCliente,
+        formaDePago: formaDepago,
         fechaFinal: fechaFinalFormateada,
       };
     });
@@ -585,12 +648,7 @@ export const CrearClienteExistenteModal = ({
                 <select
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
                   value={datosCliente.formaDePago}
-                  onChange={(e) =>
-                    setDatosCliente({
-                      ...datosCliente,
-                      formaDePago: e.target.value,
-                    })
-                  }
+                  onChange={handleFormaDePagoChange}
                 >
                   {opcionesFormaPago.map((opcion) => (
                     <option key={opcion} value={opcion}>

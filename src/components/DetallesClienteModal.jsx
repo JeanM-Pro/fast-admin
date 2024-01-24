@@ -216,7 +216,9 @@ export const DetallesClienteModal = ({
                   {cuotasRestantes}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {selectedDetallesCliente.cuotasAtrasadas}
+                  {selectedDetallesCliente.cuotasAtrasadas < 0
+                    ? 0
+                    : selectedDetallesCliente.cuotasAtrasadas}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
                   {`$${

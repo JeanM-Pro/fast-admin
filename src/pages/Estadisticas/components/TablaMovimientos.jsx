@@ -6,7 +6,8 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
   const claseColores = (descripcion) => {
     if (
       descripcion === "Abono Editado (suma)" ||
-      descripcion === "abono cliente"
+      descripcion === "abono cliente" ||
+      descripcion === "Ingreso"
     ) {
       return "text-green-700";
     } else {
@@ -45,7 +46,8 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                 >
                   <div className="items-center w-full h-full flex gap-2 mx-auto justify-center">
                     {item.descripcion === "Abono Editado (suma)" ||
-                    item.descripcion === "abono cliente" ? (
+                    item.descripcion === "abono cliente" ||
+                    item.descripcion === "Ingreso" ? (
                       <ImArrowDown />
                     ) : (
                       <ImArrowUp />

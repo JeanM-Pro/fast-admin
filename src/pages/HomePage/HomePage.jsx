@@ -307,6 +307,14 @@ export const HomePage = () => {
             </div>
             <div className="mt-2">
               <div className="flex items-center">
+                <div className="w-[20px] h-[20px] bg-blue-700 mr-1 border border-black"></div>
+                <span>Clientes mensuales</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-[20px] h-[20px] bg-orange-950 mr-1 border border-black"></div>
+                <span>Clientes semanales</span>
+              </div>
+              <div className="flex items-center">
                 <div className="w-[20px] h-[20px] bg-red-500 mr-1 border border-black"></div>
                 <span>Clientes vencidos</span>
               </div>

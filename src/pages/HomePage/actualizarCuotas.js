@@ -10,36 +10,61 @@ export const actualizarCuotas = async ({
 
     // Utilizar una variable temporal para acumular los cambios
     let infoClientesActualizado = infoClientes.map((cliente) => {
-      const { abono, fechaUltimoAbono, actualizado } = cliente;
-      const fechaActual = new Date();
+      const { abono, fechaUltimoAbono, actualizado, formaDePago } = cliente;
+      const fechaActualNueva = new Date();
       const fechaUltimoAbonoDate = new Date(fechaUltimoAbono);
       const ultimoReset = new Date(actualizado);
-      fechaActual.setHours(0, 0, 0, 0);
+      fechaActualNueva.setHours(0, 0, 0, 0);
       fechaUltimoAbonoDate.setHours(0, 0, 0, 0);
       ultimoReset.setHours(0, 0, 0, 0);
-      const noEsHoy = fechaUltimoAbonoDate < fechaActual;
-      const actualizadoHoy = ultimoReset.getTime() === fechaActual.getTime();
+      const noEsHoy = fechaUltimoAbonoDate < fechaActualNueva;
+      const actualizadoHoy =
+        ultimoReset.getTime() === fechaActualNueva.getTime();
 
       if (abono === 0 && noEsHoy && !actualizadoHoy) {
-        const cuotasAtrasadasActualizadas = cliente.cuotasAtrasadas + 1;
-        batch.push(
-          updateDoc(
-            doc(
-              db,
-              "admin_users",
-              usuarioRuta.adminUid,
-              "rutas",
-              usuarioRuta.uid,
-              "clientes",
-              cliente.uid
-            ),
-            {
-              cuotasAtrasadas: cuotasAtrasadasActualizadas,
-              actualizado: new Date().toDateString(),
-            }
-          )
-        );
-        return { ...cliente, cuotasAtrasadas: cuotasAtrasadasActualizadas };
+        let cuotasAtrasadasActualizadas;
+
+        if (formaDePago === "semanal" || formaDePago === "mensual") {
+          cuotasAtrasadasActualizadas = 0;
+          batch.push(
+            updateDoc(
+              doc(
+                db,
+                "admin_users",
+                usuarioRuta.adminUid,
+                "rutas",
+                usuarioRuta.uid,
+                "clientes",
+                cliente.uid
+              ),
+              {
+                cuotasAtrasadas: cuotasAtrasadasActualizadas,
+                actualizado: new Date().toDateString(),
+              }
+            )
+          );
+          return { ...cliente, cuotasAtrasadas: cuotasAtrasadasActualizadas };
+        } else {
+          cuotasAtrasadasActualizadas = cliente.cuotasAtrasadas + 1;
+          batch.push(
+            updateDoc(
+              doc(
+                db,
+                "admin_users",
+                usuarioRuta.adminUid,
+                "rutas",
+                usuarioRuta.uid,
+                "clientes",
+                cliente.uid
+              ),
+              {
+                cuotasAtrasadas: cuotasAtrasadasActualizadas,
+                actualizado: new Date().toDateString(),
+              }
+            )
+          );
+          return { ...cliente, cuotasAtrasadas: cuotasAtrasadasActualizadas };
+        }
       } else if (abono > 0 && noEsHoy && !actualizadoHoy) {
         batch.push(
           updateDoc(

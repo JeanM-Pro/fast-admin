@@ -8,11 +8,12 @@ import { MoonLoader } from "react-spinners";
 
 export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
   const [responsable, setResponsable] = useState(selectedRuta.responsable);
-  const [saldoInicial, setSaldoInicial] = useState(
-    parseInt(selectedRuta.saldoInicial)
-  );
+  const [valor, setValor] = useState(0);
+  const [sumaResta, setSumaResta] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const { rutasData, setRutasData, userData } = useContext(miContexto);
+  console.log(valor);
+  console.log(selectedRuta);
 
   const editarRuta = async () => {
     setIsEditing(true);
@@ -30,37 +31,42 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
 
     let nuevoMonto;
     let motivo;
+    let nuevoHistorial;
 
-    if (rutaData.saldoInicial > saldoInicial) {
-      nuevoMonto = parseInt(rutaData.saldoInicial) - saldoInicial;
-      motivo = "Retiro";
-    } else {
-      nuevoMonto = saldoInicial - parseInt(rutaData.saldoInicial);
+    if (sumaResta === "sumar") {
+      nuevoMonto = parseInt(rutaData.saldoInicial) + valor;
       motivo = "Ingreso";
+      nuevoHistorial = parseInt(rutaData.historialSaldos) + valor;
+    } else {
+      nuevoMonto = parseInt(rutaData.saldoInicial) - valor;
+      motivo = "Retiro";
+      nuevoHistorial = parseInt(rutaData.historialSaldos) - valor;
     }
 
     await updateDoc(rutaRef, {
       ...rutaData,
       responsable: responsable,
-      saldoInicial: saldoInicial,
+      saldoInicial: nuevoMonto,
       movimientos: [
         {
-          monto: nuevoMonto,
+          monto: valor,
           fecha: new Date(),
           responsable: "Admin",
           descripcion: motivo,
         },
         ...rutaData.movimientos,
       ],
-      historialSaldos: [
-        { fecha: new Date(), saldo: saldoInicial },
-        ...rutaData.historialSaldos,
-      ],
+      historialSaldos: nuevoHistorial,
     });
 
     const updatedRutasData = rutasData.map((ruta) =>
       ruta.uid === selectedRuta.uid
-        ? { ...ruta, responsable, saldoInicial }
+        ? {
+            ...ruta,
+            responsable,
+            saldoInicial: nuevoMonto,
+            historialSaldos: nuevoHistorial,
+          }
         : ruta
     );
 
@@ -80,7 +86,7 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
 
         <h2 className="text-center text-xl font-semibold">Editar Ruta</h2>
         <form className="w-full mt-2">
-          <div className="w-full flex flex-col gap-6 items-center">
+          <div className="w-full flex flex-col gap-2 items-center">
             <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
               <div className="h-full w-[40px] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
                 <AiOutlineUser size={24} />
@@ -101,18 +107,37 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
               <input
                 type="number"
                 className="flex-1 rounded-md w-full px-2 focus:border-transparent focus:outline-none"
-                placeholder="Saldo Nuevo"
-                value={saldoInicial}
-                onChange={(e) => setSaldoInicial(parseInt(e.target.value))}
+                placeholder="Ingresar valor"
+                onChange={(e) => setValor(parseInt(e.target.value))}
                 required
               />
+            </div>
+            <div className="w-full flex justify-around">
+              <button
+                className={`bg-green-600 text-base font-semibold mt-2 w-fit text-white py-[2px] rounded-md flex justify-center items-center min-w-[80px] ${
+                  sumaResta === "sumar" ? "bg-green-900" : null
+                }`}
+                onClick={() => setSumaResta("sumar")}
+                type="button"
+              >
+                Sumar
+              </button>
+              <button
+                type="button"
+                className={`bg-red-600 text-base font-semibold mt-2 w-fit text-white py-[2px] rounded-md flex justify-center items-center min-w-[80px] ${
+                  sumaResta === "restar" ? "bg-red-900" : null
+                }`}
+                onClick={() => setSumaResta("restar")}
+              >
+                Restar
+              </button>
             </div>
             <div className="mt-2 flex justify-between w-full">
               <button
                 type="button"
                 className="bg-[#8131bd] text-lg font-semibold mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
                 onClick={editarRuta}
-                disabled={isEditing}
+                disabled={isEditing || sumaResta === ""}
               >
                 {isEditing ? (
                   <MoonLoader size={20} color="#ffffff" />
