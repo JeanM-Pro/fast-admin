@@ -73,11 +73,15 @@ export const HomePage = () => {
   useEffect(() => {
     let sumaPagosDiarioscuenta = 0;
 
-    for (let i = 0; i < infoClientes?.length; i++) {
-      sumaPagosDiarioscuenta += infoClientes[i].pagoDiario;
+    if (infoClientes && infoClientes.length > 0) {
+      console.log();
+      for (let i = 0; i < infoClientes.length; i++) {
+        sumaPagosDiarioscuenta += infoClientes[i].pagoDiario;
+      }
     }
 
     setSumaPagosDiarios(sumaPagosDiarioscuenta);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [infoClientes]);
 
   const handleCrearRuta = () => {
@@ -335,9 +339,7 @@ export const HomePage = () => {
                 <span className="text-xs md:text-sm mr-1 md:font-semibold font-bold uppercase">
                   cuotas por cobrar:
                 </span>
-                <span className="font-bold ">
-                  R${parseInt(sumaPagosDiarios)}
-                </span>
+                <span className="font-bold ">R${sumaPagosDiarios}</span>
               </div>
             </div>
           </>

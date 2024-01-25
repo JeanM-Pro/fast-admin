@@ -21,11 +21,21 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
       <table className="min-w-full mt-2 bg-white">
         <thead>
           <tr className="bg-[#8131bd] text-white uppercase text-sm">
-            <th className="border border-black w-[8%] px-2 py-1">#</th>
-            <th className="border border-black w-[46%] px-2 py-1">Monto</th>
-            <th className="border border-black w-[46%] px-2 py-1">Fecha</th>
-            <th className="border border-black w-[46%] px-2 py-1">Motivo</th>
-            <th className="border border-black w-[46%] px-2 py-1">Usuario</th>
+            <th className="whitespace-nowrap border border-black w-[8%] px-2 py-1">
+              #
+            </th>
+            <th className="whitespace-nowrap border border-black w-[46%] px-2 py-1">
+              Monto
+            </th>
+            <th className="whitespace-nowrap border border-black w-[46%] px-2 py-1">
+              Fecha
+            </th>
+            <th className="whitespace-nowrap border border-black w-[46%] px-2 py-1">
+              Motivo
+            </th>
+            <th className="whitespace-nowrap border border-black w-[46%] px-2 py-1">
+              Usuario
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -37,15 +47,15 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                   index % 2 === 0 ? "bg-gray-300" : "bg-gray-100"
                 } border border-black font-semibold uppercase text-sm`}
               >
-                <td className="border border-black text-center px-2 py-1">
+                <td className="whitespace-nowrap border border-black text-center px-2 py-1">
                   {index + 1}
                 </td>
                 <td
-                  className={`border border-black text-center px-2 py-1 ${claseColores(
+                  className={`whitespace-nowrap border border-black text-center px-2 py-1 ${claseColores(
                     item.descripcion
                   )} `}
                 >
-                  <div className="items-center w-full h-full flex gap-2 mx-auto justify-center">
+                  <div className="whitespace-nowrap items-center w-full h-full flex gap-2 mx-auto justify-center">
                     {item.descripcion === "Abono Editado (suma)" ||
                     item.descripcion === "abono cliente" ||
                     item.descripcion === "Ingreso" ||
