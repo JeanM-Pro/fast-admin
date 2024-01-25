@@ -87,72 +87,98 @@ export const DetallesClienteModal = ({
             />
           </div>
 
-          <img
-            src={selectedDetallesCliente.imageUrl}
-            alt="imagen de perfil"
-            className="w-full h-auto"
-          />
+          {selectedDetallesCliente.imageUrl ? (
+            <img
+              src={selectedDetallesCliente.imageUrl}
+              alt="imagen de perfil"
+              className="w-full h-auto"
+            />
+          ) : (
+            <span className="text-red-600"> No se cargó foto de perfil </span>
+          )}
 
           <p className="uppercase font-semibold mt-1">
             Cliente:{" "}
             <span className="font-bold">
-              {selectedDetallesCliente.nombreCliente}
+              {selectedDetallesCliente.nombreCliente
+                ? selectedDetallesCliente.nombreCliente
+                : "Sin datos"}
             </span>
           </p>
 
           <p className="uppercase font-semibold">
             CPF:{" "}
-            <span className="font-bold">{selectedDetallesCliente.cpf}</span>
+            <span className="font-bold">
+              {selectedDetallesCliente.cpf
+                ? selectedDetallesCliente.cpf
+                : "Sin datos"}
+            </span>
           </p>
 
           <p className="uppercase font-semibold">
             tlf:{" "}
             <span className="font-bold">
-              {selectedDetallesCliente.telefono}
+              {selectedDetallesCliente.telefono
+                ? selectedDetallesCliente.telefono
+                : "Sin datos"}
             </span>
           </p>
 
           <p className="uppercase font-semibold text-sm whitespace-pre-line">
             direccion:{" "}
             <span className="font-bold">
-              {selectedDetallesCliente.direccion}
+              {selectedDetallesCliente.direccion
+                ? selectedDetallesCliente.direccion
+                : "Sin datos"}
             </span>
           </p>
 
           <p className="uppercase font-semibold whitespace-pre-line">
             direccion de cobro:{" "}
             <span className="font-bold">
-              {selectedDetallesCliente.direccionCobro}
+              {selectedDetallesCliente.direccionCobro
+                ? selectedDetallesCliente.direccionCobro
+                : "sin datos"}
             </span>
           </p>
 
           <p className="uppercase font-semibold mt-1 whitespace-pre-line">
             Descripcion:{" "}
             <span className="font-bold">
-              {selectedDetallesCliente.descripcion}
+              {selectedDetallesCliente.descripcion
+                ? selectedDetallesCliente.descripcion
+                : "sin datos"}
             </span>
           </p>
 
           <p className="uppercase font-semibold mt-1">
-            Ver foto de tienda{" "}
-            <span
-              className="text-[#8131bd] font-semibold cursor-pointer"
-              onClick={() => setVerFotoDeTienda(true)}
-            >
-              ver
-            </span>
+            Ver foto de tienda:{" "}
+            {selectedDetallesCliente.imageTienda ? (
+              <span
+                className="text-[#8131bd] font-semibold cursor-pointer"
+                onClick={() => setVerFotoDeTienda(true)}
+              >
+                ver
+              </span>
+            ) : (
+              <span className="font-bold">sin datos</span>
+            )}
           </p>
 
           <p className="uppercase font-semibold break-all">
             ubicacion:{" "}
-            <a
-              href={`https://www.google.com/maps?q=${ubicacion?.latitud},${ubicacion?.longitud}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#8131bd] font-semibold"
-            >
-              Ver en Google Maps
-            </a>
+            {selectedDetallesCliente.ubicacion !== "" ? (
+              <a
+                href={`https://www.google.com/maps?q=${ubicacion?.latitud},${ubicacion?.longitud}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#8131bd] font-semibold"
+              >
+                Ver en Google Maps
+              </a>
+            ) : (
+              <span className="font-bold">sin datos</span>
+            )}
           </p>
 
           <table className="w-full mt-2 flex">
