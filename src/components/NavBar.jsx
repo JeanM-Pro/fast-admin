@@ -1,6 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import logoNav from "../images/logonav.png";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import logoLetra from "../images/logoLetra.png";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiFillHome } from "react-icons/ai";
@@ -14,6 +14,8 @@ import { auth } from "../firebase/firebaseConfig";
 export const Navbar = () => {
   const [toggleNavbar, setToggleNavbar] = useState(false);
   const [animationNavbar, setAnimationNavbar] = useState(false);
+  const [mostrarGastos, setMostrarGastos] = useState(false);
+  const [mostrarEstadisticas, setMostrarEstadisticas] = useState(false);
   const { handleLogout, isLogouting, userData } = useContext(miContexto);
   const navigate = useNavigate();
 
@@ -31,16 +33,35 @@ export const Navbar = () => {
   const ruta = location.pathname;
 
   const user = auth.currentUser;
-  let mostrar;
-  if (
-    user?.email === "jeancenteno54@fastadmin.com" ||
-    user?.email === "jeziel@fastadmin.com" ||
-    userData?.isAdmin === false
-  ) {
-    mostrar = false;
-  } else {
-    mostrar = true;
-  }
+
+  useEffect(() => {
+    const updateUserDisplay = () => {
+      // Lógica para mostrar u ocultar elementos según el usuario
+      if (
+        user?.email === "jeancenteno54@fastadmin.com" ||
+        user?.email === "jeziel@fastadmin.com" ||
+        userData?.isAdmin
+      ) {
+        setMostrarGastos(false);
+      } else {
+        setMostrarGastos(true);
+      }
+
+      if (
+        user?.email === "jeancenteno54@fastadmin.com" ||
+        user?.email === "jeziel@fastadmin.com"
+      ) {
+        setMostrarEstadisticas(false);
+      } else {
+        setMostrarEstadisticas(true);
+      }
+    };
+
+    updateUserDisplay(); // Llamar a la función al montar el componente
+
+    // También puedes agregar userData como dependencia si es necesario
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userData]);
 
   return (
     <>
@@ -72,7 +93,7 @@ export const Navbar = () => {
                 </NavLink>
               </li>
 
-              {mostrar ? (
+              {mostrarGastos ? (
                 <li>
                   <NavLink
                     className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
@@ -83,7 +104,7 @@ export const Navbar = () => {
                 </li>
               ) : null}
 
-              {mostrar ? (
+              {mostrarEstadisticas ? (
                 <li>
                   <NavLink
                     className="lg:p-4 py-3 px-0 block border-b-2 border-transparent hover:border-indigo-400"
@@ -131,7 +152,7 @@ export const Navbar = () => {
                 Inicio
               </NavLink>
 
-              {mostrar ? (
+              {mostrarGastos ? (
                 <NavLink
                   to="/gastos-diarios"
                   className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
@@ -143,7 +164,7 @@ export const Navbar = () => {
                 </NavLink>
               ) : null}
 
-              {mostrar ? (
+              {mostrarEstadisticas ? (
                 <NavLink
                   to="/estadisticas"
                   className={`w-full flex items-center px-5 font-semibold text-lg py-3 rounded-3xl ${
