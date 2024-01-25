@@ -69,7 +69,14 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
           responsable: responsable,
           saldoInicial: saldoInicial,
           historialGastos: [],
-          movimientos: [],
+          movimientos: [
+            {
+              monto: saldoInicial,
+              fecha: new Date(),
+              responsable: "admin",
+              descripcion: "saldo inicial",
+            },
+          ],
           historialSaldos: saldoInicial,
           proximoPago: userData.proximoPago,
         });
@@ -84,7 +91,14 @@ export const RegisterRutaPage = ({ setIsModalCreateRuta, userData }) => {
             responsable: responsable,
             saldoInicial: saldoInicial,
             historialGastos: [],
-            movimientos: [],
+            movimientos: [
+              {
+                monto: saldoInicial,
+                fecha: new Date(),
+                responsable: "admin",
+                descripcion: "saldo inicial",
+              },
+            ],
             historialSaldos: saldoInicial,
             proximoPago: userData.proximoPago,
           },

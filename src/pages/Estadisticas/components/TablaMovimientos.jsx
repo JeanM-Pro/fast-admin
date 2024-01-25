@@ -7,7 +7,8 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
     if (
       descripcion === "Abono Editado (suma)" ||
       descripcion === "abono cliente" ||
-      descripcion === "Ingreso"
+      descripcion === "Ingreso" ||
+      descripcion === "saldo inicial"
     ) {
       return "text-green-700";
     } else {
@@ -47,7 +48,8 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                   <div className="items-center w-full h-full flex gap-2 mx-auto justify-center">
                     {item.descripcion === "Abono Editado (suma)" ||
                     item.descripcion === "abono cliente" ||
-                    item.descripcion === "Ingreso" ? (
+                    item.descripcion === "Ingreso" ||
+                    item.descripcion === "saldo inicial" ? (
                       <ImArrowDown />
                     ) : (
                       <ImArrowUp />
