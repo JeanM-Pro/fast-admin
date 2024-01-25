@@ -298,7 +298,7 @@ export const HomePage = () => {
 
               <div className="flex flex-col items-center mt-2">
                 <span className="text-xl font-bold leading-3">
-                  ${usuarioRuta.saldoInicial}
+                  R${usuarioRuta.saldoInicial}
                 </span>
                 <span className="text-xs md:text-base md:font-semibold font-bold">
                   SALDO DISPONIBLE
@@ -330,7 +330,7 @@ export const HomePage = () => {
                 <span className="text-xs md:text-sm mr-1 md:font-semibold font-bold uppercase">
                   cuotas por cobrar:
                 </span>
-                <span className="font-bold ">${sumaPagosDiarios}</span>
+                <span className="font-bold ">R${sumaPagosDiarios}</span>
               </div>
             </div>
           </>

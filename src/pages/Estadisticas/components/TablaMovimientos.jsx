@@ -54,7 +54,7 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                     ) : (
                       <ImArrowUp />
                     )}
-                    <span>${item.monto}</span>
+                    <span>R${item.monto}</span>
                   </div>
                 </td>
                 <td className="items-center whitespace-nowrap border-black flex justify-center px-1 py-1">

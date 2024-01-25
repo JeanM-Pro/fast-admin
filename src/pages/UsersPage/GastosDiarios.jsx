@@ -88,7 +88,7 @@ export const GastosDiarios = () => {
           <div className="bg-white border shadow-[2px_2px_8px_rgb(0,0,0,0.5)] border-gray-400 w-full md:w-[400px] p-4 rounded-md max-h-[90%]">
             <div className="flex flex-col items-center mb-2 ">
               <span className="text-xl font-bold leading-4 md:leading-3">
-                ${usuarioRuta?.saldoInicial}
+                R${usuarioRuta?.saldoInicial}
               </span>
               <span className="text-xs md:text-base md:font-semibold font-bold">
                 SALDO DISPONIBLE

@@ -32,7 +32,7 @@ export const TablaGastos = ({ datos }) => {
                     {index + 1}
                   </td>
                   <td className="border text-sm border-black text-center px-2 py-1">
-                    ${item.valor}
+                    R${item.valor}
                   </td>
                   <td className="border text-sm whitespace-nowrap border-black text-center px-2 py-1">
                     {item.descripcion}

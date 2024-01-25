@@ -40,7 +40,7 @@ export const VerTablaClientesModal = ({
             <span className="text-xs md:text-sm mr-1 md:font-semibold font-bold uppercase">
               cuotas por cobrar:
             </span>
-            <span className="font-bold ">${sumaPagosDiarios}</span>
+            <span className="font-bold ">R${sumaPagosDiarios}</span>
           </div>
         </div>
 

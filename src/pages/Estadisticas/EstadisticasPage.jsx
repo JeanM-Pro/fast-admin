@@ -127,7 +127,7 @@ export const EstadisticasPage = () => {
           <p>
             Saldo Actual:{" "}
             <span className="font-bold">
-              $
+              R$
               {usuarioRuta?.saldoInicial
                 ? usuarioRuta?.saldoInicial
                 : saldoRutas}
@@ -137,7 +137,7 @@ export const EstadisticasPage = () => {
           <p>
             {userData ? "Total saldo invertido: " : "Ultimo saldo ingresado: "}
             <span className="font-bold">
-              ${saldoMasNuevo ? saldoMasNuevo : ultimoSaldo}
+              R${saldoMasNuevo ? saldoMasNuevo : ultimoSaldo}
             </span>
           </p>
 
@@ -145,14 +145,14 @@ export const EstadisticasPage = () => {
             <p>
               Ganancias:
               <span className="font-bold ml-1">
-                ${gananciasRutas >= 0 ? gananciasRutas : 0}
+                R${gananciasRutas >= 0 ? gananciasRutas : 0}
               </span>
             </p>
           ) : (
             <p>
               Ganancias:
               <span className="font-bold ml-1">
-                ${ganancias >= 0 ? ganancias : 0}
+                R${ganancias >= 0 ? ganancias : 0}
               </span>
             </p>
           )}
@@ -180,14 +180,15 @@ export const EstadisticasPage = () => {
           ) : (
             <>
               <p>
-                Cobro del dia: <span className="font-bold">${totalAbonos}</span>
+                Cobro del dia:{" "}
+                <span className="font-bold">R${totalAbonos}</span>
               </p>
               <p>
                 Prestamos del dia:{" "}
-                <span className="font-bold">${prestamoDelDia}</span>
+                <span className="font-bold">R${prestamoDelDia}</span>
               </p>
               <p>
-                Gastos del dia: <span className="font-bold">${gastosHoy}</span>
+                Gastos del dia: <span className="font-bold">R${gastosHoy}</span>
               </p>
               <button
                 type="button"

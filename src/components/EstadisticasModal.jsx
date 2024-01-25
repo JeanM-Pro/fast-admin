@@ -109,19 +109,19 @@ export const EstadisticasModal = ({
           <div>
             <p>
               Saldo Actual:{" "}
-              <span className="font-bold">${selectedRuta?.saldoInicial}</span>
+              <span className="font-bold">R${selectedRuta?.saldoInicial}</span>
             </p>
             <p>
               Ultimo saldo ingresado:{" "}
               <span className="font-bold">
-                ${saldoMasNuevo ? saldoMasNuevo : ""}
+                R${saldoMasNuevo ? saldoMasNuevo : ""}
               </span>
             </p>
 
             <p>
               Ganancias:{" "}
               <span className="font-bold">
-                ${ganancias >= 0 ? ganancias : 0}
+                R${ganancias >= 0 ? ganancias : 0}
               </span>
             </p>
             <p>
@@ -130,15 +130,15 @@ export const EstadisticasModal = ({
             </p>
 
             <p>
-              Cobro del dia: <span className="font-bold">${totalAbonos}</span>
+              Cobro del dia: <span className="font-bold">R${totalAbonos}</span>
             </p>
 
             <p>
               Prestamos del dia:{" "}
-              <span className="font-bold">${prestamoDelDia}</span>
+              <span className="font-bold">R${prestamoDelDia}</span>
             </p>
             <p>
-              Gastos del dia: <span className="font-bold">${gastosHoy}</span>
+              Gastos del dia: <span className="font-bold">R${gastosHoy}</span>
             </p>
           </div>
           <button

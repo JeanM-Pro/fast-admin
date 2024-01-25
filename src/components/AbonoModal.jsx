@@ -251,7 +251,7 @@ export const AbonoModal = ({
         {!pagoHoy || userData?.isAdmin ? (
           <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
             <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-              Abonar $
+              Abonar R$
             </div>
             <input
               type="number"

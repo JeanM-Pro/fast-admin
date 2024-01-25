@@ -267,31 +267,51 @@ export const TablaClientes = ({
       ) : null}
       <table className="min-w-full mt-2 bg-white">
         <thead>
-          <tr className="bg-[#8131bd] uppercase text-sm text-white">
+          <tr className="bg-[#8131bd] uppercase text-sm text-white ">
             {isEditIndex ? (
-              <th className="border border-black w-6 px-2 py-1">Orden</th>
+              <th className="border border-black w-6 px-2 py-1 whitespace-nowrap">
+                Orden
+              </th>
             ) : null}
             {isEditIndex ? (
-              <th className="border border-black w-6 px-2 py-1">cambiar</th>
+              <th className="border border-black w-6 px-2 py-1 whitespace-nowrap">
+                cambiar
+              </th>
             ) : null}
-            <th className="border border-black w-6 px-2 py-1">#</th>
-            <th className="border border-black min-w-fit px-2 py-1">Cliente</th>
+            <th className="border border-black w-6 px-2 py-1 whitespace-nowrap">
+              #
+            </th>
+            <th className="border border-black min-w-fit px-2 py-1 whitespace-nowrap">
+              Cliente
+            </th>
             <th className="border border-black min-w-fit px-2 py-1 whitespace-nowrap">
               abonó hoy
             </th>
-            <th className="border border-black w-fit px-2 py-1">cuota</th>
-            <th className="border border-black w-fit px-2 py-1">c.pag</th>
-            <th className="border border-black w-fit px-2 py-1">c.res</th>
+            <th className="border border-black w-fit px-2 py-1 whitespace-nowrap">
+              cuota
+            </th>
+            <th className="border border-black w-fit px-2 py-1 whitespace-nowrap">
+              c.pag
+            </th>
+            <th className="border border-black w-fit px-2 py-1 whitespace-nowrap">
+              c.res
+            </th>
             {userData?.isAdmin && (
               <>
-                <th className="border border-black w-10 px-2 py-1">Editar</th>
-                <th className="border border-black w-10 px-2 py-1">Eliminar</th>
+                <th className="border border-black w-10 px-2 py-1 whitespace-nowrap">
+                  Editar
+                </th>
+                <th className="border border-black w-10 px-2 py-1 whitespace-nowrap">
+                  Eliminar
+                </th>
               </>
             )}
 
-            <th className="border border-black w-fit px-2 py-1">detalles</th>
+            <th className="border border-black w-fit px-2 py-1 whitespace-nowrap">
+              detalles
+            </th>
             {userData && rutasFiltradas.length >= 1 ? (
-              <th className="border border-black w-[200px] md:w-fit px-10 md:px-2 py-1">
+              <th className="border border-black w-[200px] md:w-fit px-10 md:px-2 py-1 whitespace-nowrap">
                 mover
               </th>
             ) : null}
@@ -307,7 +327,7 @@ export const TablaClientes = ({
                 } border border-black text-sm font-semibold py-2`}
               >
                 {isEditIndex ? (
-                  <td className="items-center uppercase border-black flex justify-center px-1 py-2">
+                  <td className="items-center uppercase border-black flex justify-center px-1 py-2 whitespace-nowrap">
                     <input
                       type="number"
                       placeholder={item.posicion}
@@ -324,7 +344,7 @@ export const TablaClientes = ({
                 ) : null}
 
                 {isEditIndex ? (
-                  <td className="px-2 py-2 border border-black">
+                  <td className="px-2 py-2 border border-black whitespace-nowrap">
                     <button
                       onClick={handleButtonClick}
                       className="border w-full border-black bg-green-500 rounded-md"
@@ -335,7 +355,7 @@ export const TablaClientes = ({
                 ) : null}
 
                 <td
-                  className={`${
+                  className={`whitespace-nowrap ${
                     item.cuotasAtrasadas >= 2 && item.cuotasAtrasadas <= 7
                       ? "bg-green-500"
                       : null
@@ -359,40 +379,40 @@ export const TablaClientes = ({
                   {index + 1}
                 </td>
 
-                <td className="items-center uppercase border-black min-w-max flex justify-center px-1 py-2">
+                <td className="whitespace-nowrap items-center uppercase border-black min-w-max flex justify-center px-1 py-2">
                   {item.nombreCliente}
                 </td>
 
                 <td
-                  className="border border-black px-2 w-fit text-center py-2"
+                  className="whitespace-nowrap border border-black px-2 w-fit text-center py-2"
                   onClick={() => handleAbono(item)}
                 >
-                  ${item.abono}
+                  R${item.abono}
                 </td>
 
-                <td className="border border-black px-2 w-fit text-center py-2">
-                  {`$${item.pagoDiario}`}
+                <td className="whitespace-nowrap border border-black px-2 w-fit text-center py-2">
+                  {`R$${item.pagoDiario}`}
                 </td>
 
-                <td className="border border-black px-2 w-fit text-center py-2">
+                <td className="whitespace-nowrap border border-black px-2 w-fit text-center py-2">
                   {Math.floor(item.totalAbono / item.pagoDiario)}
                 </td>
 
-                <td className="border border-black px-2 w-fit text-center py-2">
+                <td className="whitespace-nowrap border border-black px-2 w-fit text-center py-2">
                   {item.cuotasPactadas -
                     Math.floor(item.totalAbono / item.pagoDiario)}
                 </td>
 
                 {userData?.isAdmin && (
                   <>
-                    <td className="border border-black w-10 text-center px-2 py-1 font-semibold">
+                    <td className="whitespace-nowrap border border-black w-10 text-center px-2 py-1 font-semibold">
                       <AiOutlineEdit
                         onClick={() => handleEditClick(item)}
                         className="cursor-pointer my-0 mx-auto"
                       />
                     </td>
 
-                    <td className="border border-black w-10  px-2 py-1 font-semibold">
+                    <td className="whitespace-nowrap border border-black w-10  px-2 py-1 font-semibold">
                       <AiOutlineDelete
                         className="cursor-pointer my-0 mx-auto"
                         onClick={() => handleDeleteClick(item)}
@@ -403,13 +423,13 @@ export const TablaClientes = ({
 
                 <td
                   onClick={() => handleDetallesCliente(item)}
-                  className="border border-black px-2 w-fit text-center py-2 underline uppercase cursor-pointer"
+                  className="border whitespace-nowrap border-black px-2 w-fit text-center py-2 underline uppercase cursor-pointer"
                 >
                   ver
                 </td>
 
                 {userData && rutasFiltradas.length >= 1 ? (
-                  <td className="border border-black px-2 w-fit text-center py-2 underline uppercase cursor-pointer">
+                  <td className="border whitespace-nowrap border-black px-2 w-fit text-center py-2 underline uppercase cursor-pointer">
                     <select
                       className="flex-1 rounded-r-md w-full px-1 focus:border-transparent focus:outline-none"
                       defaultValue="Seleccionar"

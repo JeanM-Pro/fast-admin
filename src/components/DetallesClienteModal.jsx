@@ -212,25 +212,25 @@ export const DetallesClienteModal = ({
                   {selectedDetallesCliente.formaDePago}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${selectedDetallesCliente.valorPrestamo}`}
+                  {`R$${selectedDetallesCliente.valorPrestamo}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
                   {`${selectedDetallesCliente.porcentajeInteres}%`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${creditoTotal}`}
+                  {`R$${creditoTotal}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${selectedDetallesCliente.pagoDiario}`}
+                  {`R$${selectedDetallesCliente.pagoDiario}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${selectedDetallesCliente.abono}`}
+                  {`R$${selectedDetallesCliente.abono}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${valorPico}`}
+                  {`R$${valorPico}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${selectedDetallesCliente.totalAbono}`}
+                  {`R$${selectedDetallesCliente.totalAbono}`}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
                   {totalCuotas}
@@ -247,7 +247,7 @@ export const DetallesClienteModal = ({
                     : selectedDetallesCliente.cuotasAtrasadas}
                 </td>
                 <td className="w-full border-b border-black px-2 py-1 text-center font-bold">
-                  {`$${
+                  {`R$${
                     selectedDetallesCliente.cuotasAtrasadas > 0
                       ? selectedDetallesCliente.pagoDiario *
                           selectedDetallesCliente.cuotasAtrasadas -
@@ -256,7 +256,7 @@ export const DetallesClienteModal = ({
                   }`}
                 </td>
                 <td className="w-full px-2 py-1 text-center font-bold">
-                  {`$${deudaActual}`}
+                  {`R$${deudaActual}`}
                 </td>
               </tr>
             </tbody>

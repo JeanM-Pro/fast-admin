@@ -30,7 +30,7 @@ export const TablaHistorial = ({ datos }) => {
                   {index + 1}
                 </td>
                 <td className="border border-black text-center px-2 py-1">
-                  ${item.abono}
+                  R${item.abono}
                 </td>
                 <td className="items-center border-black flex justify-center px-1 py-1">
                   {formatDate(item.fecha)}
