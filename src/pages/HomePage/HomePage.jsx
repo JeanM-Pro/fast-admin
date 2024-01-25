@@ -28,6 +28,7 @@ export const HomePage = () => {
     useState(false);
   const [isAvisoPago, setIsAvisoPago] = useState(false);
   const [isLockedAcount, setIsLockedAcount] = useState(false);
+  const [sumaPagosDiarios, setSumaPagosDiarios] = useState(0);
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -69,11 +70,15 @@ export const HomePage = () => {
 
   const posicionArroba = userData?.email.indexOf("@");
 
-  let sumaPagosDiarios = 0;
+  useEffect(() => {
+    let sumaPagosDiarioscuenta = 0;
 
-  for (let i = 0; i < infoClientes?.length; i++) {
-    sumaPagosDiarios += infoClientes[i].pagoDiario;
-  }
+    for (let i = 0; i < infoClientes?.length; i++) {
+      sumaPagosDiarioscuenta += infoClientes[i].pagoDiario;
+    }
+
+    setSumaPagosDiarios(sumaPagosDiarioscuenta);
+  }, [infoClientes]);
 
   const handleCrearRuta = () => {
     if (rutasDisponibles === 0) {
@@ -330,7 +335,9 @@ export const HomePage = () => {
                 <span className="text-xs md:text-sm mr-1 md:font-semibold font-bold uppercase">
                   cuotas por cobrar:
                 </span>
-                <span className="font-bold ">R${sumaPagosDiarios}</span>
+                <span className="font-bold ">
+                  R${parseInt(sumaPagosDiarios)}
+                </span>
               </div>
             </div>
           </>
