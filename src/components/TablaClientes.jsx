@@ -384,7 +384,13 @@ export const TablaClientes = ({
                 </td>
 
                 <td
-                  className="whitespace-nowrap border border-black px-2 w-fit text-center py-2"
+                  className={`${
+                    item.abono >= item.pagoDiario ? "bg-green-300" : null
+                  } ${
+                    item.abono < item.pagoDiario && item.abono > 0
+                      ? "bg-yellow-200"
+                      : null
+                  } whitespace-nowrap border border-black px-2 w-fit text-center py-2`}
                   onClick={() => handleAbono(item)}
                 >
                   R${item.abono}
