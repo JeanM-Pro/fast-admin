@@ -2,17 +2,23 @@ import React, { useContext, useEffect, useState } from "react";
 import { Navbar } from "../../components/NavBar";
 import { miContexto } from "../../context/AppContext";
 import { TablaMovimientosModal } from "./components/TablaMovimientosModal";
-import { format } from "date-fns";
 import { ModalCambiarContrasena } from "../../components/ModalCambiarContrasena";
 
 export const EstadisticasPage = () => {
-  const { usuarioRuta, formatDate, infoClientes, rutasData, userData } =
-    useContext(miContexto);
+  const {
+    usuarioRuta,
+    formatDate,
+    infoClientes,
+    rutasData,
+    userData,
+    calcularPrestamoDelDia,
+    formatDate2,
+    calcularTotalAbonos,
+  } = useContext(miContexto);
   const [mostrarMovimientos, setMostrarMovimientos] = useState(false);
   const [verCambiarContrasenaModal, setverCambiarContrasenaModal] =
     useState(false);
   const [gastosHoy, setGastosHoy] = useState(0);
-  const { formatDate2 } = useContext(miContexto);
 
   useEffect(() => {
     if (usuarioRuta && usuarioRuta.historialGastos) {
@@ -62,45 +68,8 @@ export const EstadisticasPage = () => {
     parseInt(usuarioRuta?.saldoInicial) -
     parseInt(usuarioRuta?.historialSaldos);
 
-  const calcularTotalAbonos = () => {
-    // infoClientes es el array de clientes que contiene la propiedad 'abono'
-    if (!infoClientes || infoClientes?.length === 0) {
-      return 0; // Si no hay clientes, el total de abonos es cero
-    }
-
-    // Sumar los abonos de todos los clientes
-    const totalAbonos = infoClientes?.reduce(
-      (acumulador, cliente) => acumulador + (cliente.abono || 0),
-      0
-    );
-
-    return totalAbonos;
-  };
-
   // Obtener el total de abonos llamando a la función
   const totalAbonos = calcularTotalAbonos();
-
-  const fechaHoy = format(new Date(), "dd/MM/yyyy");
-
-  const calcularPrestamoDelDia = () => {
-    // infoClientes es el array de clientes que contiene la propiedad 'valorPrestamo'
-    if (!infoClientes || infoClientes?.length === 0) {
-      return 0; // Si no hay clientes, el total de préstamos es cero
-    }
-
-    // Filtrar los clientes cuya fecha sea igual a la fecha de hoy
-    const clientesDelDia = infoClientes?.filter(
-      (cliente) => cliente.fechaActual === fechaHoy
-    );
-
-    // Sumar los valores de 'valorPrestamo' de los clientes del día
-    const prestamoDelDia = clientesDelDia?.reduce(
-      (acumulador, cliente) => acumulador + (cliente.valorPrestamo || 0),
-      0
-    );
-
-    return prestamoDelDia;
-  };
 
   // Obtener el total de préstamos del día llamando a la función
   const prestamoDelDia = calcularPrestamoDelDia();

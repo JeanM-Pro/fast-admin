@@ -3,6 +3,7 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { format } from "date-fns";
 
 export const miContexto = createContext(undefined);
 
@@ -218,6 +219,44 @@ export const AppContext = ({ children }) => {
     return `${dia <= 9 ? `0${dia}` : dia}/${mes <= 9 ? `0${mes}` : mes}/${ano}`;
   };
 
+  // Calcular prestamos del dia
+  const fechaHoy = format(new Date(), "dd/MM/yyyy");
+  const calcularPrestamoDelDia = () => {
+    // infoClientes es el array de clientes que contiene la propiedad 'valorPrestamo'
+    if (!infoClientes || infoClientes?.length === 0) {
+      return 0; // Si no hay clientes, el total de préstamos es cero
+    }
+
+    // Filtrar los clientes cuya fecha sea igual a la fecha de hoy
+    const clientesDelDia = infoClientes?.filter(
+      (cliente) => cliente.fechaActual === fechaHoy
+    );
+
+    // Sumar los valores de 'valorPrestamo' de los clientes del día
+    const prestamoDelDia = clientesDelDia?.reduce(
+      (acumulador, cliente) => acumulador + (cliente.valorPrestamo || 0),
+      0
+    );
+
+    return prestamoDelDia;
+  };
+
+  // Calcular total abonos
+  const calcularTotalAbonos = () => {
+    // infoClientes es el array de clientes que contiene la propiedad 'abono'
+    if (!infoClientes || infoClientes?.length === 0) {
+      return 0; // Si no hay clientes, el total de abonos es cero
+    }
+
+    // Sumar los abonos de todos los clientes
+    const totalAbonos = infoClientes?.reduce(
+      (acumulador, cliente) => acumulador + (cliente.abono || 0),
+      0
+    );
+
+    return totalAbonos;
+  };
+
   return (
     <miContexto.Provider
       value={{
@@ -234,6 +273,8 @@ export const AppContext = ({ children }) => {
         formatDate,
         setUsersAdminData,
         formatDate2,
+        calcularPrestamoDelDia,
+        calcularTotalAbonos,
       }}
     >
       {children}

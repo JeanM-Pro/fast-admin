@@ -42,8 +42,11 @@ export const HomePage = () => {
     rutasData,
     formatDate2,
     setRutasData,
+    calcularTotalAbonos,
   } = useContext(miContexto);
   const db = getFirestore();
+
+  const totalAbonos = calcularTotalAbonos();
 
   let rutasDisponibles = parseInt(userData?.cantidadRutas) - rutasData?.length;
 
@@ -335,11 +338,17 @@ export const HomePage = () => {
                 <div className="w-[20px] h-[20px] bg-green-500 mr-1 border border-black"></div>
                 <span>+2 dias sin pagar</span>
               </div>
-              <div className="flex w-fit items-center mt-3">
+              <div className="flex w-fit items-center mt-2">
                 <span className="text-xs md:text-sm mr-1 md:font-semibold font-bold uppercase">
                   cuotas por cobrar:
                 </span>
                 <span className="font-bold ">R${sumaPagosDiarios}</span>
+              </div>
+              <div className="flex w-fit items-center">
+                <span className="text-xs md:text-sm mr-1 md:font-semibold font-bold uppercase">
+                  Cobrado hoy:
+                </span>
+                <span className="font-bold ">R${totalAbonos}</span>
               </div>
             </div>
           </>
