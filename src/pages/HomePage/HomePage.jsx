@@ -365,12 +365,12 @@ export const HomePage = () => {
         )}
 
         {usuarioRuta && (
-          <div className="w-full flex justify-center items-center relative mt-6">
-            <div className="absolute left-0 flex ">
+          <div className="w-full flex justify-center items-center relative mt-6 ">
+            <div className="absolute left-0 flex z-0">
               {!isEditIndex ? (
                 <button
                   type="button"
-                  className="bg-white font-semibold  w-fit text-[#8131bd] px-2 py-1 rounded-md flex justify-center items-center min-w-[80px] shadow-lg"
+                  className="bg-white font-semibold z-0 w-fit text-[#8131bd] px-2 py-1 rounded-md flex justify-center items-center min-w-[80px] shadow-lg"
                   onClick={() => setisEditIndex(true)}
                 >
                   Ordenar lista
@@ -380,7 +380,7 @@ export const HomePage = () => {
               {isEditIndex ? (
                 <button
                   type="button"
-                  className="bg-white font-semibold  w-fit text-[#8131bd] px-2 py-1 rounded-md flex justify-center items-center min-w-[80px] shadow-lg"
+                  className="bg-white font-semibold z-0 w-fit text-[#8131bd] px-2 py-1 rounded-md flex justify-center items-center min-w-[80px] shadow-lg"
                   onClick={() => setisEditIndex(false)}
                 >
                   Terminar
@@ -388,7 +388,7 @@ export const HomePage = () => {
               ) : null}
             </div>
 
-            <h2 className="text-lg font-bold uppercase">
+            <h2 className="text-lg font-bold uppercase z-0">
               {usuarioRuta.nombreRuta}
             </h2>
           </div>

@@ -65,7 +65,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <div className="fixed w-full lg:px-16 px-6 flex justify-between items-center lg:py-0 py-2 bg-white shadow-[2px_0px_6px_rgb(0,0,0,0.5)]">
+      <div className="fixed w-full lg:px-16 z-10 px-6 flex justify-between items-center lg:py-0 py-2 bg-white shadow-[2px_0px_6px_rgb(0,0,0,0.5)]">
         <img
           src={logoNav}
           alt="logo"
