@@ -159,23 +159,22 @@ export const HomePage = () => {
         const fechaHoy = new Date();
 
         infoClientes.forEach(async (cliente) => {
-          if (cliente.historialPagos) {
-            const eliminarCliente =
-              cliente.cuotasPactadas === cliente.cuotasPagadas &&
-              cliente.historialPagos.some((pago) => {
-                const fechaPago = pago.fecha.toDate();
-                const fechaPagoMasUnDia = new Date(
-                  fechaPago.getTime() + 24 * 60 * 60 * 1000
-                ); // Añadir un día
+          if (
+            cliente.historialPagos &&
+            cliente.cuotasPactadas === cliente.cuotasPagadas
+          ) {
+            // Obtener la fecha del último pago
+            const fechasPagos = cliente.historialPagos.map((pago) =>
+              pago.fecha.toDate()
+            );
+            const ultimaFechaPago = new Date(Math.max(...fechasPagos));
 
-                return (
-                  fechaPagoMasUnDia.getDate() === fechaHoy.getDate() &&
-                  fechaPagoMasUnDia.getMonth() === fechaHoy.getMonth() &&
-                  fechaPagoMasUnDia.getFullYear() === fechaHoy.getFullYear()
-                );
-              });
+            // Añadir un día a la última fecha de pago
+            const fechaLimiteEliminacion = new Date(
+              ultimaFechaPago.getTime() + 24 * 60 * 60 * 1000
+            );
 
-            if (eliminarCliente) {
+            if (fechaHoy >= fechaLimiteEliminacion) {
               const clienteRef = doc(
                 db,
                 "admin_users",
@@ -188,6 +187,7 @@ export const HomePage = () => {
 
               try {
                 await deleteDoc(clienteRef);
+                console.log("Cliente eliminado");
               } catch (error) {
                 console.error("Error al eliminar cliente", error);
               }
