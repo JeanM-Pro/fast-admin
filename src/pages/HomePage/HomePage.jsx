@@ -169,10 +169,13 @@ export const HomePage = () => {
             );
             const ultimaFechaPago = new Date(Math.max(...fechasPagos));
 
+            // console.log(ultimaFechaPago);
+
             // Añadir un día a la última fecha de pago
             const fechaLimiteEliminacion = new Date(
               ultimaFechaPago.getTime() + 24 * 60 * 60 * 1000
             );
+            fechaLimiteEliminacion.setHours(0, 0, 0, 0);
 
             if (fechaHoy >= fechaLimiteEliminacion) {
               const clienteRef = doc(
