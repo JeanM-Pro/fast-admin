@@ -60,7 +60,8 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
                     {item.descripcion === "Abono Editado (suma)" ||
                     item.descripcion === "abono cliente" ||
                     item.descripcion === "Ingreso" ||
-                    item.descripcion === "saldo inicial" ? (
+                    item.descripcion === "saldo inicial" ||
+                    item.descripcion === "Cliente eliminado S/C" ? (
                       <ImArrowDown />
                     ) : (
                       <ImArrowUp />
