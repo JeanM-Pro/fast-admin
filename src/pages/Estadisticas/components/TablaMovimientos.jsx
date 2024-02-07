@@ -8,7 +8,8 @@ export const TablaMovimientos = ({ usuarioRuta, formatDate }) => {
       descripcion === "Abono Editado (suma)" ||
       descripcion === "abono cliente" ||
       descripcion === "Ingreso" ||
-      descripcion === "saldo inicial"
+      descripcion === "saldo inicial" ||
+      descripcion === "Cliente eliminado S/C"
     ) {
       return "text-green-700";
     } else {

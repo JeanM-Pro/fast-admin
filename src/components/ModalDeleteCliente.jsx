@@ -58,7 +58,7 @@ export const ModalDeleteCliente = ({
             monto: clienteData.valorPrestamo,
             fecha: new Date(),
             responsable: "Admin",
-            descripcion: "Cliente eliminado",
+            descripcion: "Cliente eliminado S/C",
           },
           ...rutaData.movimientos,
         ],
