@@ -204,7 +204,7 @@ export const CrearClienteExistenteModal = ({
 
       const cuotasPactadasNum = datosCliente.cuotasPactadas
         ? datosCliente.cuotasPactadas
-        : 0;
+        : 1;
 
       for (let i = 0; i < cuotasPactadasNum; i++) {
         if (formaDepago === "diario") {
