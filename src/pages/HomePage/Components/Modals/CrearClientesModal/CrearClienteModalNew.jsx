@@ -152,7 +152,7 @@ export const CrearClienteModalNew = ({
 
       const cuotasPactadasNum = datosCliente.cuotasPactadas
         ? datosCliente.cuotasPactadas
-        : 1;
+        : 0;
 
       for (let i = 0; i < cuotasPactadasNum; i++) {
         if (formaDepago === "diario") {
@@ -452,7 +452,7 @@ export const CrearClienteModalNew = ({
 
   return (
     <>
-      <div className="w-full min-h-screen h-screen z-10 bg-black bg-opacity-50 px-2 md:px-8 flex justify-center items-center fixed ">
+      <div className="w-full min-h-screen h-screen z-20 bg-black bg-opacity-50 px-2 md:px-8 flex justify-center items-center fixed ">
         <div className="bg-gray-200 w-[400px] p-4 rounded-md relative max-h-[90%] overflow-y-auto">
           <IoIosClose
             className="absolute right-0 top-0 cursor-pointer"
@@ -570,6 +570,7 @@ export const CrearClienteModalNew = ({
                   type="number"
                   className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
                   onChange={handleCuotasPactadasChange}
+                  required
                 />
               </div>
 
