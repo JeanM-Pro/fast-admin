@@ -187,7 +187,11 @@ export const AbonoModal = ({
 
             return fechaPago.toISOString().split("T")[0] ===
               new Date().toISOString().split("T")[0]
-              ? { fecha: new Date(), abono: abono }
+              ? {
+                  fecha: new Date(),
+                  abono: abono,
+                  observaciones: observaciones,
+                }
               : historial;
           }
         );
