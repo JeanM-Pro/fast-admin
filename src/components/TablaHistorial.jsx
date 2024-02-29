@@ -32,14 +32,14 @@ export const TablaHistorial = ({ datos }) => {
                 <td className="border border-black text-center px-2 py-1">
                   {index + 1}
                 </td>
-                <td className="border border-black text-center px-2 py-1">
+                <td className="border border-black text-center px-1 py-1">
                   R${item.abono}
                 </td>
-                <td className="items-center border-black flex justify-center px-1 py-1">
+                <td className="border border-black text-center px-1 py-1">
                   {formatDate(item.fecha)}
                 </td>
 
-                <td className="border border-black text-center px-2 py-1 uppercase">
+                <td className="border border-black text-center px-[2px] py-1 uppercase">
                   {item.observaciones ? item.observaciones : "--"}
                 </td>
               </tr>
