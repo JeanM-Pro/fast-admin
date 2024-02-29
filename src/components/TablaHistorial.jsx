@@ -15,6 +15,9 @@ export const TablaHistorial = ({ datos }) => {
             <th className="border border-black w-[8%] px-2 py-1">#</th>
             <th className="border border-black w-[46%] px-2 py-1">Cantidad</th>
             <th className="border border-black w-[46%] px-2 py-1">fecha</th>
+            <th className="border border-black w-[46%] px-2 py-1">
+              Observacion
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -36,18 +39,9 @@ export const TablaHistorial = ({ datos }) => {
                   {formatDate(item.fecha)}
                 </td>
 
-                {/* <td className="border border-black w-10 text-center px-2 py-1">
-                <AiOutlineEdit
-                  onClick={() => handleEditClick(item)}
-                  className="cursor-pointer my-0 mx-auto"
-                />
-              </td>
-              <td className="border border-black w-10  px-2 py-1">
-                <AiOutlineDelete
-                  className="cursor-pointer my-0 mx-auto"
-                  onClick={() => handleDeleteClick(item)}
-                />
-              </td> */}
+                <td className="border border-black text-center px-2 py-1 uppercase">
+                  {item.observaciones ? item.observaciones : "--"}
+                </td>
               </tr>
             ))
           ) : (

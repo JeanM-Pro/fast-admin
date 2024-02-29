@@ -4,6 +4,7 @@ import { MoonLoader } from "react-spinners";
 import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { format } from "date-fns";
 import { miContexto } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 export const AbonoModal = ({
   setIsAbono,
@@ -16,6 +17,7 @@ export const AbonoModal = ({
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [abono, setAbono] = useState(0);
   const [pagoHoy, setPagoHoy] = useState(false);
+  const [observaciones, setObservaciones] = useState("Dinheiro");
   const fechaHoy = format(new Date(), "dd/MM/yyyy");
   const pagos = selectedAbono.historialPagos.map((pago) =>
     formatDate2(pago.fecha)
@@ -30,6 +32,10 @@ export const AbonoModal = ({
   }, [fechaHoy, pagoFiltrado]);
 
   const handleAbonar = async () => {
+    if (abono <= 0) {
+      return toast.error("Ingrese un monto mayor que cero '0'");
+    }
+
     try {
       setIsSubmiting(true);
 
@@ -164,6 +170,7 @@ export const AbonoModal = ({
       const nuevoHistorial = {
         abono: abono,
         fecha: new Date(),
+        observaciones: observaciones,
       };
 
       let historialPagosActualizado;
@@ -249,16 +256,29 @@ export const AbonoModal = ({
           {userData?.isAdmin ? "Editar abono diario" : "Ingresar abono diario"}
         </h2>
         {!pagoHoy || userData?.isAdmin ? (
-          <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
-            <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-              Abonar R$
+          <>
+            <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
+              <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+                Abonar R$
+              </div>
+              <input
+                type="number"
+                className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
+                onChange={(e) => setAbono(parseInt(e.target.value))}
+              />
             </div>
-            <input
-              type="number"
-              className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-              onChange={(e) => setAbono(parseInt(e.target.value))}
-            />
-          </div>
+            <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
+              <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+                Observaciones
+              </div>
+              <input
+                type="text"
+                className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+              />
+            </div>
+          </>
         ) : (
           <h2 className="font-semibold text-lg mt-1 text-red-500">
             Este cliente ya abonó hoy
