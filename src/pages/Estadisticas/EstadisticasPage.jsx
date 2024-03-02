@@ -3,6 +3,7 @@ import { Navbar } from "../../components/NavBar";
 import { miContexto } from "../../context/AppContext";
 import { TablaMovimientosModal } from "./components/TablaMovimientosModal";
 import { ModalCambiarContrasena } from "../../components/ModalCambiarContrasena";
+import { ModalNoAutorizado } from "../../components/ModalNoAutorizado";
 
 export const EstadisticasPage = () => {
   const {
@@ -19,6 +20,7 @@ export const EstadisticasPage = () => {
   const [verCambiarContrasenaModal, setverCambiarContrasenaModal] =
     useState(false);
   const [gastosHoy, setGastosHoy] = useState(0);
+  const [verModalNoautorizado, setVerModalNoautorizado] = useState(false);
 
   useEffect(() => {
     if (usuarioRuta && usuarioRuta.historialGastos) {
@@ -74,12 +76,24 @@ export const EstadisticasPage = () => {
   // Obtener el total de préstamos del día llamando a la función
   const prestamoDelDia = calcularPrestamoDelDia();
 
+  const handleCambiarContrasenha = () => {
+    if (usuarioRuta?.isAutorized || userData) {
+      setverCambiarContrasenaModal(true);
+    } else {
+      setVerModalNoautorizado(true);
+    }
+  };
+
   return (
     <>
       {verCambiarContrasenaModal ? (
         <ModalCambiarContrasena
           setverCambiarContrasenaModal={setverCambiarContrasenaModal}
         />
+      ) : null}
+
+      {verModalNoautorizado ? (
+        <ModalNoAutorizado setVerModalNoautorizado={setVerModalNoautorizado} />
       ) : null}
 
       {mostrarMovimientos ? (
@@ -138,15 +152,7 @@ export const EstadisticasPage = () => {
             </p>
           )}
 
-          {userData ? (
-            <button
-              type="button"
-              className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
-              onClick={() => setverCambiarContrasenaModal(true)}
-            >
-              Cambiar Contraseña
-            </button>
-          ) : (
+          {userData ? null : (
             <>
               <p>
                 Cobro del dia:{" "}
@@ -168,6 +174,14 @@ export const EstadisticasPage = () => {
               </button>
             </>
           )}
+
+          <button
+            type="button"
+            className="bg-[#8131bd] mt-2 w-fit text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
+            onClick={handleCambiarContrasenha}
+          >
+            Cambiar Contraseña
+          </button>
         </div>
       </div>
     </>

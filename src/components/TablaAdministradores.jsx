@@ -4,12 +4,15 @@ import { ModalDeleteRuta } from "./ModalDeleteRuta";
 import { ModalEditRuta } from "./ModalEditRuta";
 import { VerDetallesRutasModal } from "./VerDetallesRutasModal";
 import { miContexto } from "../context/AppContext";
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { MoonLoader } from "react-spinners";
 
 export const TablaAdministradores = () => {
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
   const [verDetalles, setVerDetalles] = useState(false);
+  const [isSubmiting, setisSubmiting] = useState(false);
   const { rutasData } = useContext(miContexto);
 
   const handleEditClick = (ruta) => {
@@ -25,6 +28,28 @@ export const TablaAdministradores = () => {
   const handleVerDetallesClick = (ruta) => {
     setSelectedRuta(ruta);
     setVerDetalles(true);
+  };
+
+  const handleRadioChange = async (ruta) => {
+    setisSubmiting(true);
+    const db = getFirestore();
+    try {
+      const rutaRef = doc(db, "admin_users", ruta.adminUid, "rutas", ruta.uid);
+
+      const rutaSnapshot = await getDoc(rutaRef);
+      const rutaData = rutaSnapshot.data();
+
+      if (rutaData) {
+        rutaData.isAutorized = !rutaData.isAutorized;
+
+        // Actualizar el documento en Firebase con el nuevo campo
+        await setDoc(rutaRef, rutaData, { merge: true });
+      }
+      window.location.reload();
+      setisSubmiting(false);
+    } catch (error) {
+      console.log("error al seleccionar ruta", error);
+    }
   };
 
   return (
@@ -62,6 +87,9 @@ export const TablaAdministradores = () => {
             </th>
             <th className="border border-black w-10 px-2 py-1">Editar</th>
             <th className="border border-black w-10 px-2 py-1">Eliminar</th>
+            <th className="border border-black w-10 px-2 py-1 whitespace-nowrap">
+              Cambiar Senha
+            </th>
             <th className="border border-black w-10 px-2 py-1">Detalles</th>
           </tr>
         </thead>
@@ -99,6 +127,21 @@ export const TablaAdministradores = () => {
                     className="cursor-pointer my-0 mx-auto"
                     onClick={() => handleDeleteClick(item)}
                   />
+                </td>
+
+                <td className="border border-black w-10  px-2 py-1">
+                  {isSubmiting ? (
+                    <div className="w-full flex justify-center">
+                      <MoonLoader size={16} color="#000" />
+                    </div>
+                  ) : (
+                    <input
+                      type="checkbox"
+                      checked={item.isAutorized}
+                      onChange={() => handleRadioChange(item)}
+                      className="my-0 mx-auto w-full"
+                    />
+                  )}
                 </td>
 
                 <td

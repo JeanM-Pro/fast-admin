@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { TbLock } from "react-icons/tb";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -13,12 +13,15 @@ import {
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   query,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
+import { miContexto } from "../context/AppContext";
 
 export const ModalCambiarContrasena = ({ setverCambiarContrasenaModal }) => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -28,6 +31,7 @@ export const ModalCambiarContrasena = ({ setverCambiarContrasenaModal }) => {
   const [isButtonPassword, setIsButtonPassword] = useState(true);
   const [isButtonPasswordNew, setIsButtonPasswordNew] = useState(true);
   const [isSubmiting, setIsSubmiting] = useState(false);
+  const { userData, usuarioRuta } = useContext(miContexto);
 
   const changeTypeText = () => {
     setIsButtonPassword(!isButtonPassword);
@@ -72,41 +76,93 @@ export const ModalCambiarContrasena = ({ setverCambiarContrasenaModal }) => {
 
       const db = getFirestore();
 
-      // Obtener el documento en "adminPass" asociado al usuario actual
-      const adminPassQuery = query(
-        collection(db, "adminPass"),
-        where("uid", "==", user.uid) // Suponiendo que el campo email es único
-      );
-
-      const adminPassSnapshot = await getDocs(adminPassQuery);
-
-      function isEmpty(obj) {
-        return Object.keys(obj).length === 0 && obj.constructor === Object;
-      }
-
-      if (!isEmpty(adminPassSnapshot.docs)) {
-        const adminPassRef = doc(
-          collection(db, "adminPass"),
-          adminPassSnapshot.docs[0].id
+      if (!userData) {
+        const rutasPassQuery = query(
+          collection(db, "rutasPass"),
+          where("uid", "==", user.uid)
         );
+        const rutaPassSnapshot = await getDocs(rutasPassQuery);
+        function isEmpty(obj) {
+          return Object.keys(obj).length === 0 && obj.constructor === Object;
+        }
 
-        // Obtener el documento actual para mantener los datos no relacionados con la contraseña
-        const adminPassData = adminPassSnapshot.docs[0].data();
+        if (!isEmpty(rutaPassSnapshot.docs)) {
+          const rutaPassRef = doc(
+            collection(db, "rutasPass"),
+            rutaPassSnapshot.docs[0].id
+          );
 
-        await updateDoc(adminPassRef, {
-          ...adminPassData,
-          contrasena: newPassword,
-        });
+          // Obtener el documento actual para mantener los datos no relacionados con la contraseña
+          const rutaPassData = rutaPassSnapshot.docs[0].data();
+
+          await updateDoc(rutaPassRef, {
+            ...rutaPassData,
+            contrasena: newPassword,
+          });
+        } else {
+          console.error(
+            "No se encontró el documento en arutasPass asociado al usuario actual"
+          );
+          // Manejar el caso donde no se encuentra el documento
+        }
+
+        const rutaRef = doc(
+          db,
+          "admin_users",
+          usuarioRuta.adminUid,
+          "rutas",
+          usuarioRuta.uid
+        );
+        const rutaSnapshot = await getDoc(rutaRef);
+        const rutaData = rutaSnapshot.data();
+        if (rutaData) {
+          rutaData.isAutorized = false;
+
+          // Actualizar el documento en Firebase con el nuevo campo
+          await setDoc(rutaRef, rutaData, { merge: true });
+        }
+
+        toast.success("Contraseña cambiada exitosamente");
+        setverCambiarContrasenaModal(false);
+        setIsSubmiting(false);
+        window.location.reload();
       } else {
-        console.error(
-          "No se encontró el documento en adminPass asociado al usuario actual"
+        // Obtener el documento en "adminPass" asociado al usuario actual
+        const adminPassQuery = query(
+          collection(db, "adminPass"),
+          where("uid", "==", user.uid) // Suponiendo que el campo email es único
         );
-        // Manejar el caso donde no se encuentra el documento
-      }
 
-      toast.success("Contraseña cambiada exitosamente");
-      setverCambiarContrasenaModal(false);
-      setIsSubmiting(false);
+        const adminPassSnapshot = await getDocs(adminPassQuery);
+
+        function isEmpty(obj) {
+          return Object.keys(obj).length === 0 && obj.constructor === Object;
+        }
+
+        if (!isEmpty(adminPassSnapshot.docs)) {
+          const adminPassRef = doc(
+            collection(db, "adminPass"),
+            adminPassSnapshot.docs[0].id
+          );
+
+          // Obtener el documento actual para mantener los datos no relacionados con la contraseña
+          const adminPassData = adminPassSnapshot.docs[0].data();
+
+          await updateDoc(adminPassRef, {
+            ...adminPassData,
+            contrasena: newPassword,
+          });
+        } else {
+          console.error(
+            "No se encontró el documento en adminPass asociado al usuario actual"
+          );
+          // Manejar el caso donde no se encuentra el documento
+        }
+
+        toast.success("Contraseña cambiada exitosamente");
+        setverCambiarContrasenaModal(false);
+        setIsSubmiting(false);
+      }
     } catch (error) {
       setError(error.message);
       console.error("Error al cambiar la senha", error);
