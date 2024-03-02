@@ -175,7 +175,7 @@ export const AbonoModal = ({
 
       let historialPagosActualizado;
 
-      if (userData?.isAdmin) {
+      if (userData?.isAdmin && clienteData.abono > 0) {
         // Filtrar el historial por la fecha de hoy si el usuario es un administrador
         historialPagosActualizado = clienteData.historialPagos.map(
           (historial) => {
