@@ -32,8 +32,8 @@ export const AbonoModal = ({
   }, [fechaHoy, pagoFiltrado]);
 
   const handleAbonar = async () => {
-    if (abono <= 0) {
-      return toast.error("Ingrese un monto mayor que cero '0'");
+    if (abono < 0) {
+      return toast.error("Ingrese un monto valido");
     }
 
     try {
@@ -259,7 +259,7 @@ export const AbonoModal = ({
         <h2 className="text-center text-xl font-semibold">
           {userData?.isAdmin ? "Editar abono diario" : "Ingresar abono diario"}
         </h2>
-        {!pagoHoy || userData?.isAdmin ? (
+        {!pagoHoy || userData?.isAdmin || selectedAbono.abono <= 0 ? (
           <>
             <div className="flex w-full h-[40px] border border-gray-400 rounded-md mt-2">
               <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
@@ -289,7 +289,7 @@ export const AbonoModal = ({
           </h2>
         )}
 
-        {!pagoHoy || userData?.isAdmin ? (
+        {!pagoHoy || userData?.isAdmin || selectedAbono.abono <= 0 ? (
           <button
             className="bg-[#8131bd] w-fit mt-4 text-white px-2 py-1 rounded-md flex justify-center items-center min-w-[80px]"
             disabled={isSubmiting}
