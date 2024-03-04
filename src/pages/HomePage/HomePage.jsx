@@ -29,6 +29,7 @@ export const HomePage = () => {
   const [isAvisoPago, setIsAvisoPago] = useState(false);
   const [isLockedAcount, setIsLockedAcount] = useState(false);
   const [sumaPagosDiarios, setSumaPagosDiarios] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -368,8 +369,8 @@ export const HomePage = () => {
         )}
 
         {usuarioRuta && (
-          <div className="w-full flex justify-center items-center relative mt-6 ">
-            <div className="absolute left-0 flex z-0">
+          <div className="w-full flex justify-center h-[70px] relative mt-6 ">
+            <div className="absolute bottom-0 left-0 flex z-0">
               {!isEditIndex ? (
                 <button
                   type="button"
@@ -394,6 +395,14 @@ export const HomePage = () => {
             <h2 className="text-lg font-bold uppercase z-0">
               {usuarioRuta.nombreRuta}
             </h2>
+
+            <input
+              type="text"
+              placeholder="Buscar Cliente"
+              className="absolute right-0 px-1 py-1 rounded-md bottom-0 shadow-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         )}
 
@@ -421,6 +430,7 @@ export const HomePage = () => {
               setUsuarioRuta={setUsuarioRuta}
               isEditIndex={isEditIndex}
               setisEditIndex={setisEditIndex}
+              searchTerm={searchTerm}
             />
           </div>
         )}

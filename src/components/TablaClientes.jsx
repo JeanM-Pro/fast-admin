@@ -21,6 +21,7 @@ export const TablaClientes = ({
   usuarioRuta,
   setUsuarioRuta,
   isEditIndex,
+  searchTerm,
 }) => {
   const [isAbono, setIsAbono] = useState(false);
   const [selectedAbono, setSelectedAbono] = useState(null);
@@ -207,6 +208,12 @@ export const TablaClientes = ({
     setVerDetallesCliente(true);
   };
 
+  // Filtrar recetas segun el input de buscar recetas
+
+  const filteredClients = datos?.filter((cliente) =>
+    cliente.nombreCliente.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       {isModalDelete ? (
@@ -318,8 +325,8 @@ export const TablaClientes = ({
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(clientes) && clientes.length > 0 ? (
-            clientes.map((item, index) => (
+          {Array.isArray(filteredClients) && filteredClients.length > 0 ? (
+            filteredClients.map((item, index) => (
               <tr
                 key={item.uid}
                 className={`${
