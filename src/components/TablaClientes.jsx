@@ -210,8 +210,11 @@ export const TablaClientes = ({
 
   // Filtrar recetas segun el input de buscar recetas
 
-  const filteredClients = datos?.filter((cliente) =>
-    cliente.nombreCliente.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClients = datos?.filter(
+    (cliente) =>
+      cliente &&
+      cliente.nombreCliente &&
+      cliente.nombreCliente.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

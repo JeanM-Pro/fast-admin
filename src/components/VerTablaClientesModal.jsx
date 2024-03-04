@@ -1,5 +1,6 @@
 import { IoIosClose } from "react-icons/io";
 import { TablaClientes } from "./TablaClientes";
+import { useState } from "react";
 
 export const VerTablaClientesModal = ({
   clientes,
@@ -7,6 +8,7 @@ export const VerTablaClientesModal = ({
   setVerClientes,
   setSelectedRuta,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   let sumaPagosDiarios = 0;
 
   for (let i = 0; i < clientes?.length; i++) {
@@ -44,8 +46,17 @@ export const VerTablaClientesModal = ({
           </div>
         </div>
 
+        <input
+          type="text"
+          placeholder="Buscar Cliente"
+          className=" px-1 py-1 rounded-md shadow-lg mt-1"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
         <div className="w-full overflow-x-auto py-2">
           <TablaClientes
+            searchTerm={searchTerm}
             datos={clientes}
             usuarioRuta={selectedRuta}
             setUsuarioRuta={setSelectedRuta}
