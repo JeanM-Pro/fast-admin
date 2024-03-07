@@ -12,12 +12,15 @@ export const AbonoModal = ({
   usuarioRuta,
   setUsuarioRuta,
   setSelectedAbono,
+  setIsModalPreguntaRenovacion,
+  setSearchTermExis,
 }) => {
   const { formatDate2, userData } = useContext(miContexto);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const [abono, setAbono] = useState(0);
   const [pagoHoy, setPagoHoy] = useState(false);
   const [observaciones, setObservaciones] = useState("Dinheiro");
+
   const fechaHoy = format(new Date(), "dd/MM/yyyy");
   const pagos = selectedAbono.historialPagos.map((pago) =>
     formatDate2(pago.fecha)
@@ -240,7 +243,17 @@ export const AbonoModal = ({
         cuotasAtrasadas: cuotasAtrasadasToSubtract,
         historialPagos: historialPagosActualizado,
       });
-      setIsAbono(false);
+
+      // Calcular si se pagaron todas las cupotas y poreguntar si quiere un nuevo prestamo
+      if (
+        selectedAbono.totalAbono + abono ===
+        selectedAbono.valorPrestamo + selectedAbono.porcentajeInteres
+      ) {
+        setIsAbono(false);
+        setIsModalPreguntaRenovacion(true);
+      } else {
+        setIsAbono(false);
+      }
     } catch (error) {
       console.error("Error updating data in Firebase:", error);
     } finally {

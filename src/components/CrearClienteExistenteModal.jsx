@@ -25,12 +25,14 @@ export const CrearClienteExistenteModal = ({
   setIsModalCreateClienteExistente,
   usuarioRuta,
   setUsuarioRuta,
+  searchTermExis,
+  setSearchTermExis,
 }) => {
   const { setInfoClientes, infoClientes } = useContext(miContexto);
   const [allClients, setAllClients] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageTiendaPreview, setImageTiendaPreview] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+
   const [selectedCliente, setSelectedCliente] = useState(null);
   const [showInputSearch, setShowInputSearch] = useState(true);
   const fechaDeAbono = new Date();
@@ -108,7 +110,7 @@ export const CrearClienteExistenteModal = ({
       ubicacion: cliente.ubicacion || "",
     }));
     setShowInputSearch(false);
-    setSearchTerm("");
+    setSearchTermExis("");
   };
 
   const handleValorPrestamoChange = (e) => {
@@ -487,19 +489,19 @@ export const CrearClienteExistenteModal = ({
           <input
             type="text"
             placeholder="Ingresar nombre de cliente"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchTermExis}
+            onChange={(e) => setSearchTermExis(e.target.value)}
             className="w-full p-2 mt-2 border rounded-md"
           />
         ) : null}
 
-        {searchTerm &&
+        {searchTermExis &&
           allClients &&
           allClients
             .filter((cliente) =>
               cliente.nombreCliente
                 .toLowerCase()
-                .includes(searchTerm.toLowerCase())
+                .includes(searchTermExis.toLowerCase())
             )
             .map((cliente) => (
               <div

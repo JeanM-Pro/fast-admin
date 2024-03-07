@@ -30,6 +30,7 @@ export const HomePage = () => {
   const [isLockedAcount, setIsLockedAcount] = useState(false);
   const [sumaPagosDiarios, setSumaPagosDiarios] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchTermExis, setSearchTermExis] = useState("");
   const navigate = useNavigate();
   const user = auth.currentUser;
   const {
@@ -253,6 +254,8 @@ export const HomePage = () => {
           setIsModalCreateClienteExistente={setIsModalCreateClienteExistente}
           usuarioRuta={usuarioRuta}
           setUsuarioRuta={setUsuarioRuta}
+          searchTermExis={searchTermExis}
+          setSearchTermExis={setSearchTermExis}
         />
       ) : null}
 
@@ -426,11 +429,15 @@ export const HomePage = () => {
           <div className="w-full overflow-x-auto py-2">
             <TablaClientes
               datos={infoClientes}
+              setSearchTermExis={setSearchTermExis}
               usuarioRuta={usuarioRuta}
               setUsuarioRuta={setUsuarioRuta}
               isEditIndex={isEditIndex}
               setisEditIndex={setisEditIndex}
               searchTerm={searchTerm}
+              setIsModalCreateClienteExistente={
+                setIsModalCreateClienteExistente
+              }
             />
           </div>
         )}

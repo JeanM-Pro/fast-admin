@@ -15,6 +15,7 @@ import {
 import { MoonLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { parse } from "date-fns";
+import { ModalPreguntaRenovacion } from "./ModalPreguntaRenovacion";
 
 export const TablaClientes = ({
   datos,
@@ -22,6 +23,8 @@ export const TablaClientes = ({
   setUsuarioRuta,
   isEditIndex,
   searchTerm,
+  setIsModalCreateClienteExistente,
+  setSearchTermExis,
 }) => {
   const [isAbono, setIsAbono] = useState(false);
   const [selectedAbono, setSelectedAbono] = useState(null);
@@ -34,6 +37,8 @@ export const TablaClientes = ({
   const { userData, rutasData } = useContext(miContexto);
   const [isMovingClient, setIsMovingClient] = useState(false);
   const [orderValues, setOrderValues] = useState({});
+  const [isModalPreguntaRenovacion, setIsModalPreguntaRenovacion] =
+    useState(false);
   const initialInputValues = {};
   const [inputValues, setInputValues] = useState(initialInputValues);
 
@@ -201,6 +206,7 @@ export const TablaClientes = ({
   const handleAbono = (cliente) => {
     setSelectedAbono(cliente);
     setIsAbono(true);
+    setSearchTermExis(cliente.nombreCliente);
   };
 
   const handleDetallesCliente = (cliente) => {
@@ -244,6 +250,7 @@ export const TablaClientes = ({
 
       {isAbono ? (
         <AbonoModal
+          setIsModalPreguntaRenovacion={setIsModalPreguntaRenovacion}
           setIsAbono={setIsAbono}
           selectedAbono={selectedAbono}
           usuarioRuta={usuarioRuta}
@@ -275,6 +282,14 @@ export const TablaClientes = ({
           </p>
         </div>
       ) : null}
+
+      {isModalPreguntaRenovacion ? (
+        <ModalPreguntaRenovacion
+          setIsModalPreguntaRenovacion={setIsModalPreguntaRenovacion}
+          setIsModalCreateClienteExistente={setIsModalCreateClienteExistente}
+        />
+      ) : null}
+
       <table className="min-w-full mt-2 bg-white">
         <thead>
           <tr className="bg-[#8131bd] uppercase text-sm text-white ">
