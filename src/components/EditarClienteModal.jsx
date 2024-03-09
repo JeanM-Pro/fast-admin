@@ -19,6 +19,10 @@ import {
 } from "firebase/firestore";
 import { miContexto } from "../context/AppContext";
 import { toast } from "react-toastify";
+import {
+  uploadImage,
+  uploadImageTienda,
+} from "../pages/HomePage/Components/firebaseFunctions";
 
 export const EditarClienteModal = ({
   setIsModalEdit,
@@ -32,7 +36,7 @@ export const EditarClienteModal = ({
   const [imageTiendaPreview, setImageTiendaPreview] = useState(null);
   const [allClients, setAllClients] = useState(null);
   const [datosCliente, setDatosCliente] = useState({
-    image: selectedCliente?.imageUrl,
+    imageUrl: selectedCliente?.imageUrl,
     imageTienda: selectedCliente?.imageTienda,
     cpf: selectedCliente?.cpf,
     nombreCliente: selectedCliente?.nombreCliente,
@@ -97,7 +101,7 @@ export const EditarClienteModal = ({
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setDatosCliente({ ...datosCliente, image: file });
+      setDatosCliente({ ...datosCliente, imageUrl: file });
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -247,6 +251,25 @@ export const EditarClienteModal = ({
         selectedCliente.uid
       );
 
+      const imageUrlPromise = imagePreview
+        ? uploadImage({
+            image: datosCliente.imageUrl,
+            nombre: datosCliente.nombreCliente,
+          })
+        : Promise.resolve(datosCliente.imageUrl);
+
+      const imageTiendaUrlPromise = imageTiendaPreview
+        ? uploadImageTienda({
+            imageTienda: datosCliente.imageTienda,
+            descripcion: datosCliente.uid,
+          })
+        : Promise.resolve(datosCliente.imageTienda);
+
+      const [imageUrl, imageTiendaUrl] = await Promise.all([
+        imageUrlPromise,
+        imageTiendaUrlPromise,
+      ]);
+
       const clienteSnapshot = await getDoc(clienteRef);
       const clienteData = clienteSnapshot.data();
 
@@ -260,18 +283,13 @@ export const EditarClienteModal = ({
         allClients.uid
       );
 
-      await updateDoc(clienteRef, datosCliente);
-      await updateDoc(allClienteRef, {
-        cpf: datosCliente.cpf,
-        nombreCliente: datosCliente.nombreCliente,
-        direccionCobro: datosCliente.direccionCobro,
-        telefono: datosCliente.telefono,
-        direccion: datosCliente.direccion,
-        descripcion: datosCliente.descripcion,
-        ubicacion: datosCliente.ubicacion,
-        imageUrl: datosCliente.image,
-        imageTienda: datosCliente.imageTienda,
-      });
+      const updatedDatosCliente = {
+        ...datosCliente,
+        imageUrl: imageUrl ? imageUrl : selectedCliente.imageUrl,
+        imageTienda: imageTiendaUrl
+          ? imageTiendaUrl
+          : selectedCliente.imageTienda,
+      };
 
       const rutaRef = doc(
         db,
@@ -300,6 +318,12 @@ export const EditarClienteModal = ({
         valor = rutaData.saldoInicial - resta;
         descripcion = "Prestamo Editado (suma)";
         montoFinal = datosCliente.valorPrestamo - clienteData.valorPrestamo;
+      }
+
+      if (datosCliente.valorPrestamo === clienteData.valorPrestamo) {
+        valor = rutaData.saldoInicial;
+        descripcion = `Cliente editado ${datosCliente.nombreCliente}`;
+        montoFinal = 0;
       }
 
       await updateDoc(rutaRef, {
@@ -344,10 +368,24 @@ export const EditarClienteModal = ({
         )
       );
 
+      await updateDoc(clienteRef, updatedDatosCliente);
+      await updateDoc(allClienteRef, {
+        cpf: datosCliente.cpf,
+        nombreCliente: datosCliente.nombreCliente,
+        direccionCobro: datosCliente.direccionCobro,
+        telefono: datosCliente.telefono,
+        direccion: datosCliente.direccion,
+        descripcion: datosCliente.descripcion,
+        ubicacion: datosCliente.ubicacion,
+        image: imageUrl ? imageUrl : datosCliente.image,
+        imageTienda: imageTiendaUrl ? imageTiendaUrl : datosCliente.imageTienda,
+      });
+
       toast.success("Cliente editado con exito");
 
       setIsSubmiting(false);
       setIsModalEdit(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error al editar el cliente:", error);
       setIsSubmiting(false);

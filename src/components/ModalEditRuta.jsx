@@ -12,8 +12,6 @@ export const ModalEditRuta = ({ selectedRuta, setShowModalEdit }) => {
   const [sumaResta, setSumaResta] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const { rutasData, setRutasData, userData } = useContext(miContexto);
-  console.log(valor);
-  console.log(selectedRuta);
 
   const editarRuta = async () => {
     setIsEditing(true);
