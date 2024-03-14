@@ -6,10 +6,31 @@ import { storage } from "../../../firebase/firebaseConfig";
 export const guardarClienteEnFirebase = async (
   clienteData,
   usuarioRuta,
-  fechaActual,
+  fechaInicialState,
   setInfoClientes,
   infoClientes
 ) => {
+  const formatearFechaInicialState = () => {
+    const fecha = new Date(fechaInicialState);
+    fecha.setDate(fecha.getDate() + 1);
+
+    // Obtener día, mes y año
+    const dia = fecha.getDate();
+    const mes = fecha.getMonth() + 1; // Los meses comienzan desde 0, por lo que sumamos 1
+    const anio = fecha.getFullYear();
+
+    // Formatear la fecha como dd/mm/aaaa
+    const fechaFormateada = `${formatoDosDigitos(dia)}/${formatoDosDigitos(
+      mes
+    )}/${anio}`;
+
+    return fechaFormateada;
+  };
+
+  function formatoDosDigitos(numero) {
+    return numero < 10 ? `0${numero}` : numero;
+  }
+
   try {
     // Subir la imagen y obtener la URL
 
@@ -41,7 +62,7 @@ export const guardarClienteEnFirebase = async (
       abono: clienteData.datosCliente.abono,
       cuotasPagadas: clienteData.datosCliente.cuotasPagadas,
       formaDePago: clienteData.datosCliente.formaDePago,
-      fechaActual,
+      fechaActual: formatearFechaInicialState(),
       fechaFinal: clienteData.datosCliente.fechaFinal,
       valorPico: clienteData.datosCliente.valorPico,
       fechaUltimoAbono: clienteData.datosCliente.fechaUltimoAbono,

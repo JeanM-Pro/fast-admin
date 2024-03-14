@@ -32,7 +32,8 @@ export const CrearClienteExistenteModal = ({
   const [allClients, setAllClients] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageTiendaPreview, setImageTiendaPreview] = useState(null);
-
+  const fechaNueva = formatearFechaActual();
+  const [fechaInicialState, setFechaInicialState] = useState(fechaNueva);
   const [selectedCliente, setSelectedCliente] = useState(null);
   const [showInputSearch, setShowInputSearch] = useState(true);
   const fechaDeAbono = new Date();
@@ -64,6 +65,21 @@ export const CrearClienteExistenteModal = ({
   });
   const [isSubmiting, setIsSubmiting] = useState(false);
   const opcionesFormaPago = ["diario", "semanal", "mensual"];
+
+  // Obtener la fecha actual en el formato YYYY-MM-DD
+  function formatearFechaActual() {
+    const fecha = new Date();
+
+    // Obtener año, mes y día
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0"); // Añadir ceros a la izquierda si es necesario
+    const dia = String(fecha.getDate()).padStart(2, "0"); // Añadir ceros a la izquierda si es necesario
+
+    // Formatear la fecha como YYYY-MM-DD
+    const fechaFormateada = `${anio}-${mes}-${dia}`;
+
+    return fechaFormateada;
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -157,7 +173,8 @@ export const CrearClienteExistenteModal = ({
       const valorTotal = valorPrestamoNum + porcentajeTotal;
 
       // Calcular la fecha final excluyendo los domingos
-      const fechaInicial = new Date();
+      const fechaInicial = new Date(fechaInicialState);
+      fechaInicial.setDate(fechaInicial.getDate() + 1);
       let fechaFinal = new Date(fechaInicial);
 
       for (let i = 0; i < cuotasPactadasNum; i++) {
@@ -268,28 +285,6 @@ export const CrearClienteExistenteModal = ({
     }
   };
 
-  function obtenerFechaActual() {
-    const fecha = new Date();
-
-    // Obtener día, mes y año
-    const dia = fecha.getDate();
-    const mes = fecha.getMonth() + 1; // Los meses comienzan desde 0, por lo que sumamos 1
-    const anio = fecha.getFullYear();
-
-    // Formatear la fecha como dd/mm/aaaa
-    const fechaFormateada = `${formatoDosDigitos(dia)}/${formatoDosDigitos(
-      mes
-    )}/${anio}`;
-
-    return fechaFormateada;
-  }
-
-  function formatoDosDigitos(numero) {
-    return numero < 10 ? `0${numero}` : numero;
-  }
-
-  const fechaActual = obtenerFechaActual();
-
   const obtenerUbicacionActual = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -376,7 +371,8 @@ export const CrearClienteExistenteModal = ({
       setDatosCliente({ ...datosCliente, pagoDiario: pagoDiarioNum });
 
       // Calcular la fecha final omitiendo los domingos
-      const fechaInicial = new Date();
+      const fechaInicial = new Date(fechaInicialState);
+      fechaInicial.setDate(fechaInicial.getDate() + 1);
       const fechaFinalCalculada = calcularFechaFinal(
         fechaInicial,
         cuotasPactadasNum
@@ -393,7 +389,7 @@ export const CrearClienteExistenteModal = ({
       await guardarClienteEnFirebase(
         clienteData,
         usuarioRuta,
-        fechaActual,
+        fechaInicialState,
         setInfoClientes,
         infoClientes
       );
@@ -598,6 +594,36 @@ export const CrearClienteExistenteModal = ({
                 Datos del Credito
               </h2>
 
+              {/* -------------------------------- */}
+
+              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
+                <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+                  Fecha Inicial
+                </div>
+                <input
+                  type="date"
+                  className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
+                  onChange={(e) => setFechaInicialState(e.target.value)}
+                  defaultValue={fechaInicialState}
+                />
+              </div>
+
+              <div
+                className={`${
+                  datosCliente.fechaFinal ? "flex" : "hidden"
+                }  w-full h-[40px] border border-gray-400 rounded-md`}
+              >
+                <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
+                  Fecha Final
+                </div>
+                <input
+                  type="text"
+                  className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
+                  value={datosCliente.fechaFinal}
+                  readOnly
+                />
+              </div>
+
               <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
                 <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
                   Valor Prestamo
@@ -659,32 +685,6 @@ export const CrearClienteExistenteModal = ({
                     </option>
                   ))}
                 </select>
-              </div>
-
-              {/* -------------------------------- */}
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  Fecha Inicial
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-                  defaultValue={fechaActual}
-                  readOnly
-                />
-              </div>
-
-              <div className="flex w-full h-[40px] border border-gray-400 rounded-md">
-                <div className="h-full w-[50%] bg-gray-200 flex items-center justify-center rounded-l-md border-r border-gray-400">
-                  Fecha Final
-                </div>
-                <input
-                  type="text"
-                  className="flex-1 rounded-r-md w-[50%] px-2 focus:border-transparent focus:outline-none"
-                  value={datosCliente.fechaFinal}
-                  readOnly
-                />
               </div>
 
               <button
