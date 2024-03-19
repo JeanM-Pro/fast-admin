@@ -244,10 +244,14 @@ export const AbonoModal = ({
         historialPagos: historialPagosActualizado,
       });
 
+      const sumaAbonos = selectedAbono.totalAbono + abono;
+      const deudaTotal =
+        selectedAbono.cuotasPactadas * selectedAbono.pagoDiario;
+
       // Calcular si se pagaron todas las cupotas y poreguntar si quiere un nuevo prestamo
       if (
-        selectedAbono.totalAbono + abono ===
-        selectedAbono.valorPrestamo + selectedAbono.porcentajeInteres
+        sumaAbonos === deudaTotal ||
+        selectedAbono.cuotasPagadas === selectedAbono.cuotasPactadas
       ) {
         setIsAbono(false);
         setIsModalPreguntaRenovacion(true);
